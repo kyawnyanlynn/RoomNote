@@ -27,9 +27,18 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="ConditionScreen"
+        name="index"
         options={{
-          title: "条件",
+          title: "ホーム", // ← This is what will display in the tab bar!
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="conditionScreen"
+        options={{
+          title: "条件ページ", // <-- This will show as the tab label!
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="filter-outline" size={size} color={color} />
           ),
