@@ -36,6 +36,15 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="login"
+        options={{
+          title: "ログイン", // <-- This will show as the tab label!
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="log-in-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="conditionScreen"
         options={{
           title: "条件ページ", // <-- This will show as the tab label!
