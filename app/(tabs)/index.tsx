@@ -1,6 +1,7 @@
 import { useRouter } from "expo-router";
 import React from "react";
 import { Image, ImageBackground, StyleSheet, Text, View } from "react-native";
+import "../../global.css"; // Import global styles if needed
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -18,7 +19,7 @@ export default function HomeScreen() {
           style={styles.image}
           resizeMode="contain"
         />
-        <Text style={styles.title}>もう忘れない！</Text>
+        <Text className="text-blue-800">もう忘れない！</Text>
         <Text style={styles.subtitle}>記録も比較も全部ここに。</Text>
       </View>
     </ImageBackground>
