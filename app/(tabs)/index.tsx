@@ -20,7 +20,7 @@ export default function HomeScreen() {
           resizeMode="contain"
         />
         <Text className="text-blue-800">もう忘れない！</Text>
-        <Text style={styles.subtitle}>記録も比較も全部ここに。</Text>
+        <Text className="text-white ">記録も比較も全部ここに。</Text>
       </View>
     </ImageBackground>
   );
@@ -47,10 +47,6 @@ const styles = StyleSheet.create({
   title: {
     color: "#fff",
     fontSize: 24,
-  },
-  subtitle: {
-    color: "#fff",
-    fontSize: 16,
   },
   image: {
     width: 120,
