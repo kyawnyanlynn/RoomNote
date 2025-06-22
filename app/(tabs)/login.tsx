@@ -56,7 +56,7 @@ export default function LoginScreen() {
       </TouchableOpacity>
 
       <Image
-        source={require("../../assets/images/shapes.svg")}
+        source={require("../../assets/images/shapes.png")}
         className="absolute bottom-8 w-[150px] h-10"
         resizeMode="contain"
       />

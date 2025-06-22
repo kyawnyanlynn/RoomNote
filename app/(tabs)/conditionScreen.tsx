@@ -24,16 +24,16 @@ export default function ConditionScreen() {
   };
 
   return (
-    <View className="flex-1 bg-[#6d8f2c] items-center justify-center">
-      <View className="bg-[#FFFDF8] rounded-2xl px-6 py-8 w-[90%] max-w-md items-center">
-        <View className="flex flex-row gap-2">
+    <View className="flex-1 bg-[#7A9B4A] items-center justify-center">
+      <View className="bg-white rounded-3xl p-6 pt-10 mt-8 w-[90%] shadow-lg">
+        <View className="flex-row items-center mb-4 w-full">
           <Image
-            source={require("../../assets/images/Character.svg")} // Replace with your icon path
-            className="w-10 h-10 mb-2"
+            source={require("../../assets/images/character.png")} // Replace with your icon path
+            className="w-16 h-24 mr-3"
             resizeMode="contain"
           />
-          <Text className="text-left font-bold mb-6 text-[20px]">
-            あなたがお部屋選びで重視していることを3つ以上選んでください。
+          <Text className="font-bold text-base text-left flex-1 flex-wrap">
+            あなたがお部屋選びで重視していることを３つ以上選んでください。
           </Text>
         </View>
         {/* Options */}
