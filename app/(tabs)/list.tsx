@@ -38,7 +38,7 @@ export default function RoomListScreen() {
 
         {/* カラフルな図形（PNG画像） */}
         <Image
-          source={require("../../assets/images/shapes.svg")}
+          source={require("../../assets/images/shapes2.png")}
           style={styles.bottomImage}
         />
 
