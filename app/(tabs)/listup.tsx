@@ -25,10 +25,12 @@ export default function RoomListScreen() {
 
       <SafeAreaView style={{ flex: 1 }}>
         {/* ヘッダー */}
-        <View style={styles.header}>
-          <Image source={houseIcon} style={styles.houseIcon} />
-          <Text style={styles.headerText}>あなたの条件にあったお部屋</Text>
-          <Image source={userIcon} style={styles.userIcon} />
+        <View style={styles.headerWrapper}>
+          <Image source={userIcon} style={styles.userIconTop} />
+          <View style={styles.header}>
+            <Image source={houseIcon} style={styles.houseIcon} />
+            <Text style={styles.headerText}>あなたの条件にあったお部屋</Text>
+          </View>
         </View>
 
         {/* メッセージカード部分 */}
@@ -92,11 +94,20 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 80,
     zIndex: 0,
   },
+  headerWrapper: {
+    paddingHorizontal: 24,
+    marginTop: 24,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 24,
-    marginTop: 24,
+    marginTop: 8,
+  },
+  userIconTop: {
+    width: 32,
+    height: 32,
+    resizeMode: 'contain',
+    alignSelf: 'flex-end',
   },
   houseIcon: {
     width: 36,
@@ -192,7 +203,7 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     resizeMode: 'contain',
-    tintColor: tagBorder,
+    // tintColor: tagBorder,
   },
   shapesRow: {
     flexDirection: 'row',
@@ -217,14 +228,9 @@ const styles = StyleSheet.create({
     width: 90,
     height: 90,
     borderRadius: 45,
-    backgroundColor: mainGreen,
+    backgroundColor: "#94B74B",
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOpacity: 0.15,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 6,
   },
   fabPlus: {
     fontSize: 48,
