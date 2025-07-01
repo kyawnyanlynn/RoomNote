@@ -3,14 +3,13 @@ import { Dimensions, Image, SafeAreaView, ScrollView, StyleSheet, Text, TextInpu
 
 const { width } = Dimensions.get('window');
 
-const mainGreen = '#A2BC5A';
 const yellow = '#E7C75F';
 
 const backIcon = require('../../assets/images/back_icon.png');
 const nextIcon = require('../../assets/images/next_icon.png');
 const backnav = require('../../assets/images/nav_back.png');
 const nextnav = require('../../assets/images/nav_next.png');
-const houseIcon = require('../../assets/images/home_icon.png');
+const houseIcon = require('../../assets/images/add_door.png');
 const roomImage = require('../../assets/images/room_sample2.jpg');
 
 export default function PropertyDetailScreen() {
@@ -61,12 +60,14 @@ export default function PropertyDetailScreen() {
         <TouchableOpacity style={styles.navButton}>
           <View style={styles.navContent}>
             <Image source={backnav} style={styles.navArrowIcon} />
+            <View style={{ width: 20 }} /> {/* スペース追加 */}
             <Text style={styles.navButtonText}>戻る</Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity style={styles.navButton}>
           <View style={styles.navContent}>
             <Text style={styles.navButtonText}>追加</Text>
+            <View style={{ width: 20 }} /> {/* スペース追加 */}
             <Image source={nextnav} style={styles.navArrowIcon} />
           </View>
         </TouchableOpacity>
@@ -211,7 +212,7 @@ export default function PropertyDetailScreen() {
   );
 }
 
-const IMAGE_HORIZONTAL_MARGIN = 24 + 36 + 8;
+const IMAGE_HORIZONTAL_MARGIN = 0+ 36 + 8;
 
 const styles = StyleSheet.create({
   container: {
@@ -227,10 +228,10 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   navButton: {
-    backgroundColor: mainGreen,
+    backgroundColor: '#94B74B',
     borderRadius: 24,
     paddingHorizontal: 20,
-    paddingVertical: 8,
+    paddingVertical: 6,
   },
   navContent: {
     flexDirection: 'row',
@@ -239,7 +240,7 @@ const styles = StyleSheet.create({
   },
   navButtonText: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: '500',
     letterSpacing: 2,
   },
@@ -252,7 +253,7 @@ const styles = StyleSheet.create({
   titleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 12,
+    marginTop: 24,
     marginLeft: 32,
     marginBottom: 8,
   },
@@ -306,11 +307,13 @@ const styles = StyleSheet.create({
     backgroundColor: yellow,
     justifyContent: 'center',
     alignItems: 'center',
+    opacity: 0.7,
   },
   arrowIcon: {
-    width: 20,
-    height: 20,
+    width: 32,
+    height: 32,
     resizeMode: 'contain',
+    opacity: 0.9,
   },
   section: {
     marginHorizontal: 32,

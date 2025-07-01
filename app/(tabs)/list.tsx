@@ -18,10 +18,12 @@ export default function RoomListScreen() {
 
       <SafeAreaView style={{ flex: 1 }}>
         {/* ヘッダー */}
-        <View style={styles.header}>
-          <Image source={houseIcon} style={styles.houseIcon} />
-          <Text style={styles.headerText}>あなたの条件にあったお部屋</Text>
-          <Image source={userIcon} style={styles.userIcon} />
+        <View style={styles.headerWrapper}>
+          <Image source={userIcon} style={styles.userIconTop} />
+          <View style={styles.header}>
+            <Image source={houseIcon} style={styles.houseIcon} />
+            <Text style={styles.headerText}>あなたの条件にあったお部屋</Text>
+          </View>
         </View>
 
         {/* メッセージカード */}
@@ -35,9 +37,10 @@ export default function RoomListScreen() {
         <View style={{ flex: 1 }} />
 
         {/* カラフルな図形（PNG画像） */}
-        <View style={styles.shapesRow}>
-          <Image source={shapesImage} style={styles.shapesImage} />
-        </View>
+        <Image
+          source={require("../../assets/images/shapes.svg")}
+          style={styles.bottomImage}
+        />
 
         {/* ＋ボタン */}
         <View style={styles.fabContainer}>
@@ -46,6 +49,7 @@ export default function RoomListScreen() {
           </TouchableOpacity>
         </View>
       </SafeAreaView>
+
     </View>
   );
 }
@@ -65,11 +69,14 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 80,
     zIndex: 0,
   },
+  headerWrapper: {
+    paddingHorizontal: 24,
+    marginTop: 24,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 24,
-    marginTop: 24,
+    marginTop: 8,
   },
   houseIcon: {
     width: 36,
@@ -82,11 +89,11 @@ const styles = StyleSheet.create({
     color: '#222',
     marginLeft: 8,
   },
-  userIcon: {
+  userIconTop: {
     width: 32,
     height: 32,
     resizeMode: 'contain',
-    marginLeft: 'auto',
+    alignSelf: 'flex-end',
   },
   messageCard: {
     backgroundColor: lightYellow,
@@ -99,24 +106,38 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#222',
   },
-  shapesRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 48,
-    marginTop: 0,
-  },
-  shapesImage: {
-    width: 160,
+  // shapesRow: {
+  //   flexDirection: 'row',
+  //   justifyContent: 'center',
+  //   alignItems: 'center',
+  //   marginBottom: 48,
+  //   marginTop: 0,
+  // },
+  // shapesImage: {
+  //   width: 220,
+  //   height: 48,
+  //   resizeMode: 'contain',
+  //   zIndex: 1, 
+  // },
+    bottomImage: {
+    position: "absolute",
+    bottom: 240, // ← ここをfabContainerより上になるように調整
+    left: 0,
+    right: 0,
+    marginLeft: "auto",
+    marginRight: "auto",
+    width: 150,
     height: 40,
-    resizeMode: 'contain',
+    resizeMode: "contain",
+    zIndex: 1,
   },
   fabContainer: {
     position: 'absolute',
-    bottom: 80,
+    bottom: 80, // ← bottomImageより下になるように調整
     left: 0,
     right: 0,
     alignItems: 'center',
+    zIndex: 2,
   },
   fab: {
     width: 90,
@@ -125,11 +146,6 @@ const styles = StyleSheet.create({
     backgroundColor: mainGreen,
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOpacity: 0.15,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 6,
   },
   fabPlus: {
     fontSize: 48,
