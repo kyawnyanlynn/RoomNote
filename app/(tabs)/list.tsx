@@ -3,7 +3,6 @@ import { Dimensions, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, Vi
 
 const userIcon = require('../../assets/images/mypage_icon.png');
 const houseIcon = require('../../assets/images/home_icon.png');
-const shapesImage = require('../../assets/images/shapes.png');
 
 const { width } = Dimensions.get('window');
 
