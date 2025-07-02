@@ -1,25 +1,55 @@
-import React from 'react';
-import { Dimensions, Image, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import * as ImagePicker from "expo-image-picker";
+import { useRouter } from "expo-router";
+import React, { useState } from "react";
 
-const { width } = Dimensions.get('window');
+import {
+  Dimensions,
+  Image,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
-const mainGreen = '#A2BC5A';
-const yellow = '#E7C75F';
+const { width } = Dimensions.get("window");
 
-const backIcon = require('../../assets/images/back_icon.png'); // スライダーの左矢印
-const nextIcon = require('../../assets/images/next_icon.png'); // スライダーの右矢印
-const backnav = require('../../assets/images/nav_back.png'); // navの左矢印
-const nextnav = require('../../assets/images/nav_next.png'); // navの右矢印
-const houseIcon = require('../../assets/images/home_icon.png'); // 家アイコン
-const roomImage = require('../../assets/images/room_sample2.jpg'); // 部屋画像
+const mainGreen = "#A2BC5A";
+const yellow = "#E7C75F";
+
+const backIcon = require("../../assets/images/back_icon.png"); // スライダーの左矢印
+const nextIcon = require("../../assets/images/next_icon.png"); // スライダーの右矢印
+const backnav = require("../../assets/images/nav_back.png"); // navの左矢印
+const nextnav = require("../../assets/images/nav_next.png"); // navの右矢印
+const houseIcon = require("../../assets/images/home_icon.png"); // 家アイコン
+const roomImage = require("../../assets/images/room_sample2.jpg"); // 部屋画像
 
 export default function PropertyDetailScreen() {
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const router = useRouter();
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [16, 9],
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      setSelectedImage(result.assets[0].uri);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-    
-        {/* 上部ナビゲーション */}
+      {/* 上部ナビゲーション */}
       <View style={styles.topNav}>
-        <TouchableOpacity style={styles.navButton}>
+        <TouchableOpacity
+          style={styles.navButton}
+          onPress={() => router.push("/listup")}
+        >
           <View style={styles.navContent}>
             <Image source={backnav} style={styles.navArrowIcon} />
             <Text style={styles.navButtonText}>戻る</Text>
@@ -47,10 +77,12 @@ export default function PropertyDetailScreen() {
               <Image source={backIcon} style={styles.arrowIcon} />
             </View>
           </TouchableOpacity>
-          <Image
-            source={roomImage}
-            style={styles.roomImage}
-          />
+          <TouchableOpacity onPress={pickImage} style={{ flex: 1 }}>
+            <Image
+              source={selectedImage ? { uri: selectedImage } : roomImage}
+              style={styles.roomImage}
+            />
+          </TouchableOpacity>
           <TouchableOpacity style={styles.sliderArrowRight}>
             <View style={styles.arrowCircle}>
               <Image source={nextIcon} style={styles.arrowIcon} />
@@ -66,10 +98,14 @@ export default function PropertyDetailScreen() {
           </View>
           <View style={styles.tagsRow}>
             <View style={[styles.tag, styles.tagYellowBorder]}>
-              <Text style={[styles.tagText, styles.tagYellowText]}>日当たりがいい</Text>
+              <Text style={[styles.tagText, styles.tagYellowText]}>
+                日当たりがいい
+              </Text>
             </View>
             <View style={[styles.tag, styles.tagYellowBorder]}>
-              <Text style={[styles.tagText, styles.tagYellowText]}>周りが静か</Text>
+              <Text style={[styles.tagText, styles.tagYellowText]}>
+                周りが静か
+              </Text>
             </View>
           </View>
           <View style={styles.tagsRow}>
@@ -87,15 +123,21 @@ export default function PropertyDetailScreen() {
           </View>
           <View style={styles.tagsRow}>
             <View style={[styles.tag, styles.tagYellowBorder]}>
-              <Text style={[styles.tagText, styles.tagYellowText]}>換気しづらい</Text>
+              <Text style={[styles.tagText, styles.tagYellowText]}>
+                換気しづらい
+              </Text>
             </View>
             <View style={[styles.tag, styles.tagYellowBorder]}>
-              <Text style={[styles.tagText, styles.tagYellowText]}>うるさい</Text>
+              <Text style={[styles.tagText, styles.tagYellowText]}>
+                うるさい
+              </Text>
             </View>
           </View>
           <View style={styles.tagsRow}>
             <View style={[styles.tag, styles.tagYellowBorder]}>
-              <Text style={[styles.tagText, styles.tagYellowText]}>病院が遠い</Text>
+              <Text style={[styles.tagText, styles.tagYellowText]}>
+                病院が遠い
+              </Text>
             </View>
           </View>
         </View>
@@ -126,9 +168,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFDF8",
   },
   topNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginHorizontal: 24,
     marginTop: 16,
     marginBottom: 8,
@@ -139,26 +181,26 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 8,
   },
-   navContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+  navContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   navButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 18,
-    fontWeight: '500',
+    fontWeight: "500",
     letterSpacing: 2,
   },
-    navArrowIcon: {
+  navArrowIcon: {
     width: 20,
     height: 20,
-    resizeMode: 'contain',
+    resizeMode: "contain",
     margin: 4,
   },
   titleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginTop: 12,
     marginLeft: 32,
     marginBottom: 8,
@@ -166,17 +208,17 @@ const styles = StyleSheet.create({
   titleIcon: {
     width: 32,
     height: 32,
-    resizeMode: 'contain',
+    resizeMode: "contain",
     marginRight: 8,
   },
   titleText: {
     fontSize: 22,
-    fontWeight: '500',
-    color: '#222',
+    fontWeight: "500",
+    color: "#222",
   },
   imageSliderContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginHorizontal: 24,
     marginBottom: 16,
     marginTop: 8,
@@ -185,7 +227,7 @@ const styles = StyleSheet.create({
     flex: 1,
     aspectRatio: 16 / 9,
     borderRadius: 12,
-    backgroundColor: '#eee',
+    backgroundColor: "#eee",
     marginHorizontal: 8,
     width: undefined,
     height: undefined,
@@ -202,21 +244,21 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 18,
     backgroundColor: yellow,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   arrowIcon: {
     width: 20,
     height: 20,
-    resizeMode: 'contain',
+    resizeMode: "contain",
   },
   section: {
     marginHorizontal: 32,
     marginTop: 16,
   },
   sectionTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 8,
   },
   dot: {
@@ -241,45 +283,45 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '500',
-    color: '#222',
+    fontWeight: "500",
+    color: "#222",
   },
   tagsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     marginBottom: 8,
   },
   tag: {
     borderWidth: 2,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 6,
     marginRight: 12,
     marginBottom: 8,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   tagYellowBorder: {
     borderColor: yellow,
   },
   tagText: {
-    color: '#222',
+    color: "#222",
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   tagYellowText: {
-    color: '#222222',
+    color: "#222222",
   },
   memoInput: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 8,
     borderWidth: 1.5,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     minHeight: 48,
     marginTop: 8,
     paddingHorizontal: 12,
     paddingVertical: 8,
     fontSize: 16,
-    color: '#222',
+    color: "#222",
   },
 });
