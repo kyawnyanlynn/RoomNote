@@ -41,9 +41,9 @@ export default function ConditionScreen() {
           {options.map((option) => (
             <TouchableOpacity
               key={option}
-              className={`border border-gray-400 rounded-full px-4 py-3 m-1 ${
+              className={`border border-gray-400 rounded-full px-4 py-2 m-1 ${
                 selected.includes(option)
-                  ? "bg-yellow-200 border-yellow-400"
+                  ? "bg-yellow-200 border-black text-white"
                   : "bg-white"
               }`}
               onPress={() => toggleOption(option)}
