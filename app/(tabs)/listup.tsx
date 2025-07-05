@@ -22,41 +22,36 @@ const mainGreen = "#A2BC5A";
 const lightYellow = "#FDF6E0";
 const yellow = "#E7C75F";
 const tagBorder = "#E7C75F";
-
-// メッセージカードの高さを大きめに設定
 const CARD_HEIGHT = 140;
 
 export default function RoomListScreen() {
   const router = useRouter();
   return (
     <View style={styles.container}>
-      {/* 下部の背景 */}
+      {/* Bottom background */}
       <View style={styles.bottomBackground} />
 
       <SafeAreaView style={{ flex: 1 }}>
-        {/* ヘッダー */}
-        <View style={styles.header}>
-          <Image source={houseIcon} style={styles.houseIcon} />
-          <Text style={styles.headerText}>あなたの条件にあったお部屋</Text>
-          <TouchableOpacity
-            style={styles.userIcon}
-            onPress={() => router.push("/conditionScreen")}
-          >
-            <Image source={userIcon} style={styles.userIcon} />
+        {/* Header */}
+        <View style={styles.headerWrapper}>
+          <TouchableOpacity onPress={() => router.push("/conditionScreen")}>
+            <Image source={userIcon} style={styles.userIconTop} />
           </TouchableOpacity>
+          <View style={styles.header}>
+            <Image source={houseIcon} style={styles.houseIcon} />
+            <Text style={styles.headerText}>あなたの条件にあったお部屋</Text>
+          </View>
         </View>
 
-        {/* メッセージカード部分 */}
+        {/* Message Card */}
         <View style={styles.messageCard}>
           <View style={styles.cardRow}>
-            {/* 部屋画像とスコア */}
             <View style={styles.roomImageContainer}>
               <Image source={roomImage} style={styles.roomImage} />
               <View style={styles.scoreBadge}>
                 <Text style={styles.scoreText}>79</Text>
               </View>
             </View>
-            {/* タグと編集アイコン */}
             <View style={styles.tagsContainer}>
               <View style={styles.tagRow}>
                 <View style={styles.tag}>
@@ -85,12 +80,12 @@ export default function RoomListScreen() {
 
         <View style={{ flex: 1 }} />
 
-        {/* カラフルな図形（PNG画像） */}
+        {/* Shapes image */}
         <View style={styles.shapesRow}>
           <Image source={shapesImage} style={styles.shapesImage} />
         </View>
 
-        {/* ＋ボタン */}
+        {/* FAB */}
         <View style={styles.fabContainer}>
           <TouchableOpacity style={styles.fab}>
             <Text style={styles.fabPlus}>＋</Text>
@@ -109,18 +104,27 @@ const styles = StyleSheet.create({
   bottomBackground: {
     position: "absolute",
     bottom: 0,
-    width: width,
+    width,
     height: 160,
     backgroundColor: lightYellow,
     borderTopLeftRadius: 80,
     borderTopRightRadius: 80,
     zIndex: 0,
   },
+  headerWrapper: {
+    paddingHorizontal: 24,
+    marginTop: 24,
+  },
+  userIconTop: {
+    width: 32,
+    height: 32,
+    resizeMode: "contain",
+    alignSelf: "flex-end",
+  },
   header: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 24,
-    marginTop: 24,
+    marginTop: 8,
   },
   houseIcon: {
     width: 36,
@@ -132,12 +136,6 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: "#222",
     marginLeft: 8,
-  },
-  userIcon: {
-    width: 32,
-    height: 32,
-    resizeMode: "contain",
-    marginLeft: "auto",
   },
   messageCard: {
     backgroundColor: lightYellow,
