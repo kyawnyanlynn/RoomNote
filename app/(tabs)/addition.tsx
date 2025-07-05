@@ -168,4 +168,5 @@ export default function PropertyDetailScreen() {
 
         {/* Upload Modals */}
         <Modal visible={showUploadText} transparent animationType="fade">
-          <TouchableOpacity style={styles.modalOverlay} onPressOut={() => setShowUp
+          <TouchableOpacity style={styles.modalOverlay} onPressOut={() => setShowUp}
+          </TouchableOpacity>
