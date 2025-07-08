@@ -1,19 +1,26 @@
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
+import { getApps, initializeApp } from "firebase/app";
+import { addDoc, collection, getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 import React, { useState } from "react";
 import {
   Dimensions,
   Image,
-  Modal,
+  LogBox,
   SafeAreaView,
   ScrollView,
-  StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import { firebaseConfig } from "../../firebaseConfig"; // ← ensure this exists
 
 const { width } = Dimensions.get("window");
+const app = initializeApp(firebaseConfig);
+const storage = getStorage(app);
+const db = getFirestore(app);
 
 const mainGreen = "#A2BC5A";
 const yellow = "#E7C75F";
@@ -24,6 +31,11 @@ const backnav = require("../../assets/images/nav_back.png");
 const nextnav = require("../../assets/images/nav_next.png");
 const houseIcon = require("../../assets/images/add_door.png");
 const defaultRoomImage = require("../../assets/images/room_sample2.jpg");
+
+if (!getApps().length) {
+  initializeApp(firebaseConfig);
+}
+LogBox.ignoreLogs([`Setting a timer for a long period`]);
 
 export default function PropertyDetailScreen() {
   const router = useRouter();
@@ -44,14 +56,8 @@ export default function PropertyDetailScreen() {
   ]);
   const [selectedMerit, setSelectedMerit] = useState<number[]>([]);
   const [selectedDemerit, setSelectedDemerit] = useState<number[]>([]);
-  const [roomImageUri, setRoomImageUri] = useState<string | null>(null);
-
-  const [showUploadText, setShowUploadText] = useState(false);
-  const [showSelectModal, setShowSelectModal] = useState(false);
-  const [isAddingMerit, setIsAddingMerit] = useState(false);
-  const [isAddingDemerit, setIsAddingDemerit] = useState(false);
-  const [newMerit, setNewMerit] = useState("");
-  const [newDemerit, setNewDemerit] = useState("");
+  const [note, setNote] = useState("");
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const toggleMerit = (idx: number) => {
     setSelectedMerit((prev) =>
@@ -65,322 +71,199 @@ export default function PropertyDetailScreen() {
     );
   };
 
-  const addMeritTag = () => {
-    if (newMerit.trim()) {
-      setMeritTags([...meritTags, newMerit.trim()]);
-      setNewMerit("");
-      setIsAddingMerit(false);
+  const handleRegister = async () => {
+    try {
+      const selectedMeritTags = selectedMerit.map((i) => meritTags[i]);
+      const selectedDemeritTags = selectedDemerit.map((i) => demeritTags[i]);
+
+      await addDoc(collection(db, "properties"), {
+        merits: selectedMeritTags,
+        demerits: selectedDemeritTags,
+        note,
+        createdAt: new Date(),
+        // Add selectedImage when uploading later
+      });
+
+      alert("登録が完了しました！");
+      router.push("/listup");
+    } catch (error) {
+      console.error("Firebase error:", error);
+      alert("アップロード中にエラーが発生しました。");
     }
   };
 
-  const addDemeritTag = () => {
-    if (newDemerit.trim()) {
-      setDemeritTags([...demeritTags, newDemerit.trim()]);
-      setNewDemerit("");
-      setIsAddingDemerit(false);
-    }
-  };
-
-  const pickRoomImage = async () => {
-    setShowSelectModal(false);
+  const handlePickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      alert("写真へのアクセスが許可されていません。");
+      alert("写真ライブラリへのアクセス許可が必要です。");
       return;
     }
+
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [16, 9],
-      quality: 0.8,
+      aspect: [4, 3],
+      quality: 1,
     });
-    if (!result.canceled && result.assets?.length > 0) {
-      setRoomImageUri(result.assets[0].uri);
-    }
-  };
 
-  const takeRoomPhoto = async () => {
-    setShowSelectModal(false);
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== "granted") {
-      alert("カメラへのアクセスが許可されていません。");
-      return;
-    }
-    const result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true,
-      aspect: [16, 9],
-      quality: 0.8,
-    });
-    if (!result.canceled && result.assets?.length > 0) {
-      setRoomImageUri(result.assets[0].uri);
+    if (!result.canceled && result.assets.length > 0) {
+      setSelectedImage(result.assets[0].uri);
     }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-[#FFFDF8]">
       {/* Header */}
-      <View style={styles.topNav}>
+      <View className="flex-row justify-between items-center mx-6 mt-4 mb-3">
         <TouchableOpacity
           onPress={() => router.push("/listup")}
-          style={styles.navButton}
+          className="bg-[#A2BC5A] rounded-full px-5 py-1.5"
         >
-          <View style={styles.navContent}>
-            <Image source={backnav} style={styles.navArrowIcon} />
-            <View style={{ width: 20 }} />
-            <Text style={styles.navButtonText}>戻る</Text>
+          <View className="flex-row items-center justify-center">
+            <Image source={backnav} className="w-5 h-5" resizeMode="contain" />
+            <View className="w-5" />
+            <Text className="text-white p-[3px] text-[18px] font-medium tracking-wider">
+              戻る
+            </Text>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navButton}>
-          <View style={styles.navContent}>
-            <Text style={styles.navButtonText}>追加</Text>
-            <View style={{ width: 20 }} />
-            <Image source={nextnav} style={styles.navArrowIcon} />
+        <TouchableOpacity
+          className="bg-[#A2BC5A] rounded-full px-5 py-1.5"
+          onPress={handleRegister}
+        >
+          <View className="flex-row items-center justify-center">
+            <Text className="text-white p-[3px] text-[18px] font-medium tracking-wider">
+              登録
+            </Text>
+            <View className="w-5" />
+            <Image source={nextnav} className="w-5 h-5" resizeMode="contain" />
           </View>
         </TouchableOpacity>
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 32 }}>
         {/* Title */}
-        <View style={styles.titleRow}>
-          <Image source={houseIcon} style={styles.titleIcon} />
-          <Text style={styles.titleText}>物件情報</Text>
+        <View className="flex-row items-center mt-3 ml-8 mb-2">
+          <Image
+            source={houseIcon}
+            className="w-8 h-8 mr-2"
+            resizeMode="contain"
+          />
+          <Text className="text-[22px] font-medium text-[#222]">物件情報</Text>
         </View>
 
-        {/* Image */}
-        <View style={styles.imageSliderContainer}>
-          <TouchableOpacity style={styles.sliderArrowLeft}>
-            <View style={styles.arrowCircle}>
-              <Image source={backIcon} style={styles.arrowIcon} />
+        {/* Image Picker */}
+        <View className="flex-row items-center mb-4 mt-2 relative">
+          <TouchableOpacity className="absolute left-2 top-1/2 z-20 -translate-y-4.5">
+            <View className="w-9 h-9 rounded-full bg-[#E7C75F] justify-center items-center opacity-70">
+              <Image
+                source={backIcon}
+                className="w-8 h-8 opacity-90"
+                resizeMode="contain"
+              />
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={() => setShowUploadText(true)}
-            activeOpacity={0.8}
-          >
-            <Image
-              source={roomImageUri ? { uri: roomImageUri } : defaultRoomImage}
-              style={styles.roomImage}
-            />
-          </TouchableOpacity>
+          <View className="flex-1 mx-8">
+            <TouchableOpacity onPress={handlePickImage}>
+              <Image
+                source={
+                  selectedImage ? { uri: selectedImage } : defaultRoomImage
+                }
+                className="w-full aspect-[16/9] rounded-xl bg-gray-200"
+                style={{ maxWidth: width - 64 }}
+              />
+              <Text className="text-center text-gray-500 mt-2">
+                画像をタップして選択
+              </Text>
+            </TouchableOpacity>
+          </View>
 
-          <TouchableOpacity style={styles.sliderArrowRight}>
-            <View style={styles.arrowCircle}>
-              <Image source={nextIcon} style={styles.arrowIcon} />
+          <TouchableOpacity className="absolute right-2 top-1/2 z-20 -translate-y-4.5">
+            <View className="w-9 h-9 rounded-full bg-[#E7C75F] justify-center items-center opacity-70">
+              <Image
+                source={nextIcon}
+                className="w-8 h-8 opacity-90"
+                resizeMode="contain"
+              />
             </View>
           </TouchableOpacity>
         </View>
 
-        {/* Upload prompt modal */}
-        <Modal
-          visible={showUploadText}
-          transparent
-          animationType="fade"
-          onRequestClose={() => setShowUploadText(false)}
-        >
-          <TouchableOpacity
-            style={styles.modalOverlay}
-            activeOpacity={1}
-            onPressOut={() => setShowUploadText(false)}
-          >
-            <View style={styles.uploadTextModal}>
-              <Text style={styles.uploadText}>写真をアップロード</Text>
+        {/* メリット */}
+        <View className="ml-8 mt-3">
+          <Text className="font-medium mb-3 text-[#222] text-[18px]">
+            <Text style={{ color: yellow, fontSize: 18 }}>●</Text> メリット
+          </Text>
+          <View className="flex-row flex-wrap mb-1">
+            {meritTags.map((tag, idx) => (
               <TouchableOpacity
-                style={styles.uploadButton}
-                onPress={() => {
-                  setShowUploadText(false);
-                  setShowSelectModal(true);
-                }}
+                key={tag}
+                className={`border-2 rounded-full px-4 py-1 mr-2 mb-2 bg-white ${
+                  selectedMerit.includes(idx)
+                    ? "border-[#E7C75F]"
+                    : "border-gray-200"
+                }`}
+                onPress={() => toggleMerit(idx)}
               >
-                <Text style={styles.uploadButtonText}>写真をアップロード</Text>
+                <Text
+                  className={`text-[15px] p-[3px] ${
+                    selectedMerit.includes(idx) ? "text-[#222]" : "text-[#222]"
+                  }`}
+                >
+                  {tag}
+                </Text>
               </TouchableOpacity>
-            </View>
-          </TouchableOpacity>
-        </Modal>
+            ))}
+          </View>
+        </View>
 
-        {/* Camera or gallery modal */}
-        <Modal
-          visible={showSelectModal}
-          transparent
-          animationType="fade"
-          onRequestClose={() => setShowSelectModal(false)}
-        >
-          <TouchableOpacity
-            style={styles.modalOverlay}
-            activeOpacity={1}
-            onPressOut={() => setShowSelectModal(false)}
-          >
-            <View style={styles.selectModal}>
+        {/* デメリット */}
+        <View className="ml-8 mt-5">
+          <Text className="font-medium mb-3 text-[#222] text-[18px]">
+            <Text style={{ color: yellow, fontSize: 18 }}>▲</Text> デメリット
+          </Text>
+          <View className="flex-row flex-wrap mb-1">
+            {demeritTags.map((tag, idx) => (
               <TouchableOpacity
-                style={styles.selectButton}
-                onPress={takeRoomPhoto}
+                key={tag}
+                className={`border-2 rounded-full px-4 py-1 mr-2 mb-2 bg-white ${
+                  selectedDemerit.includes(idx)
+                    ? "border-[#E7C75F]"
+                    : "border-gray-200"
+                }`}
+                onPress={() => toggleDemerit(idx)}
               >
-                <Text style={styles.selectButtonText}>カメラで撮影</Text>
+                <Text
+                  className={`text-[16px] p-[3px] ${
+                    selectedDemerit.includes(idx)
+                      ? "text-[#222]"
+                      : "text-[#222]"
+                  }`}
+                >
+                  {tag}
+                </Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.selectButton}
-                onPress={pickRoomImage}
-              >
-                <Text style={styles.selectButtonText}>写真を選択</Text>
-              </TouchableOpacity>
-            </View>
-          </TouchableOpacity>
-        </Modal>
+            ))}
+          </View>
+        </View>
+
+        {/* 備考 */}
+        <View className="ml-8 mt-6 mr-8">
+          <Text className="font-medium mb-3 text-[#222] text-[18px]">
+            <Text style={{ color: yellow, fontSize: 18 }}>■</Text>備考
+          </Text>
+          <TextInput
+            className="border-2 border-[#A2BC5A] rounded-lg p-3 text-[15px] bg-white min-h-[60px] mt-1"
+            value={note}
+            onChangeText={setNote}
+            placeholder="備考を入力"
+            multiline
+            numberOfLines={3}
+            textAlignVertical="top"
+          />
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#FFFDF8",
-  },
-  topNav: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginHorizontal: 24,
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  navButton: {
-    backgroundColor: mainGreen,
-    borderRadius: 24,
-    paddingHorizontal: 20,
-    paddingVertical: 6,
-  },
-  navContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  navButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "500",
-    letterSpacing: 1,
-  },
-  navArrowIcon: {
-    width: 20,
-    height: 20,
-    resizeMode: "contain",
-  },
-  titleRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 12,
-    marginLeft: 32,
-    marginBottom: 8,
-  },
-  titleIcon: {
-    width: 32,
-    height: 32,
-    resizeMode: "contain",
-    marginRight: 8,
-  },
-  titleText: {
-    fontSize: 22,
-    fontWeight: "500",
-    color: "#222",
-  },
-  imageSliderContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginHorizontal: 0,
-    marginBottom: 16,
-    marginTop: 8,
-    position: "relative",
-  },
-  roomImage: {
-    flex: 1,
-    aspectRatio: 16 / 9,
-    borderRadius: 12,
-    backgroundColor: "#eee",
-    marginHorizontal: 32,
-    width: width,
-    height: undefined,
-    maxWidth: width,
-  },
-  sliderArrowLeft: {
-    position: "absolute",
-    left: 8,
-    top: "50%",
-    zIndex: 2,
-    transform: [{ translateY: -18 }],
-  },
-  sliderArrowRight: {
-    position: "absolute",
-    right: 8,
-    top: "50%",
-    zIndex: 2,
-    transform: [{ translateY: -18 }],
-  },
-  arrowCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: yellow,
-    justifyContent: "center",
-    alignItems: "center",
-    opacity: 0.7,
-  },
-  arrowIcon: {
-    width: 32,
-    height: 32,
-    resizeMode: "contain",
-    opacity: 0.9,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.25)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  uploadTextModal: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 24,
-    alignItems: "center",
-    minWidth: 220,
-  },
-  uploadText: {
-    fontSize: 18,
-    fontWeight: "500",
-    marginBottom: 16,
-    color: "#222",
-  },
-  uploadButton: {
-    backgroundColor: yellow,
-    borderRadius: 8,
-    paddingHorizontal: 24,
-    paddingVertical: 10,
-    marginTop: 8,
-  },
-  uploadButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  selectModal: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 24,
-    alignItems: "center",
-    minWidth: 220,
-  },
-  selectButton: {
-    backgroundColor: yellow,
-    borderRadius: 8,
-    paddingHorizontal: 24,
-    paddingVertical: 10,
-    marginVertical: 8,
-    width: 160,
-    alignItems: "center",
-  },
-  selectButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-});
