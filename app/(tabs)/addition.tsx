@@ -1,13 +1,12 @@
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
-import { getApps, initializeApp } from "firebase/app";
+import { initializeApp } from "firebase/app";
 import { addDoc, collection, getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import React, { useState } from "react";
 import {
   Dimensions,
   Image,
-  LogBox,
   SafeAreaView,
   ScrollView,
   Text,
@@ -31,11 +30,6 @@ const backnav = require("../../assets/images/nav_back.png");
 const nextnav = require("../../assets/images/nav_next.png");
 const houseIcon = require("../../assets/images/add_door.png");
 const defaultRoomImage = require("../../assets/images/room_sample2.jpg");
-
-if (!getApps().length) {
-  initializeApp(firebaseConfig);
-}
-LogBox.ignoreLogs([`Setting a timer for a long period`]);
 
 export default function PropertyDetailScreen() {
   const router = useRouter();
@@ -70,28 +64,18 @@ export default function PropertyDetailScreen() {
       prev.includes(idx) ? prev.filter((i) => i !== idx) : [...prev, idx]
     );
   };
-
-  const handleRegister = async () => {
+  const addData = async () => {
     try {
-      const selectedMeritTags = selectedMerit.map((i) => meritTags[i]);
-      const selectedDemeritTags = selectedDemerit.map((i) => demeritTags[i]);
-
-      await addDoc(collection(db, "properties"), {
-        merits: selectedMeritTags,
-        demerits: selectedDemeritTags,
-        note,
-        createdAt: new Date(),
-        // Add selectedImage when uploading later
+      await addDoc(collection(db, "Buildings"), {
+        img: selectedImage,
+        merit: selectedMerit.map((i) => meritTags[i]),
+        demerit: selectedDemerit.map((i) => demeritTags[i]),
+        note: note,
       });
-
-      alert("登録が完了しました！");
-      router.push("/listup");
     } catch (error) {
-      console.error("Firebase error:", error);
-      alert("アップロード中にエラーが発生しました。");
+      console.error("Error adding document: ", error);
     }
   };
-
   const handlePickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
@@ -129,7 +113,7 @@ export default function PropertyDetailScreen() {
         </TouchableOpacity>
         <TouchableOpacity
           className="bg-[#A2BC5A] rounded-full px-5 py-1.5"
-          onPress={handleRegister}
+          onPress={addData}
         >
           <View className="flex-row items-center justify-center">
             <Text className="text-white p-[3px] text-[18px] font-medium tracking-wider">
@@ -153,18 +137,8 @@ export default function PropertyDetailScreen() {
         </View>
 
         {/* Image Picker */}
-        <View className="flex-row items-center mb-4 mt-2 relative">
-          <TouchableOpacity className="absolute left-2 top-1/2 z-20 -translate-y-4.5">
-            <View className="w-9 h-9 rounded-full bg-[#E7C75F] justify-center items-center opacity-70">
-              <Image
-                source={backIcon}
-                className="w-8 h-8 opacity-90"
-                resizeMode="contain"
-              />
-            </View>
-          </TouchableOpacity>
-
-          <View className="flex-1 mx-8">
+        <View className="items-center mb-4 mt-2">
+          <View className="mx-8">
             <TouchableOpacity onPress={handlePickImage}>
               <Image
                 source={
@@ -178,18 +152,7 @@ export default function PropertyDetailScreen() {
               </Text>
             </TouchableOpacity>
           </View>
-
-          <TouchableOpacity className="absolute right-2 top-1/2 z-20 -translate-y-4.5">
-            <View className="w-9 h-9 rounded-full bg-[#E7C75F] justify-center items-center opacity-70">
-              <Image
-                source={nextIcon}
-                className="w-8 h-8 opacity-90"
-                resizeMode="contain"
-              />
-            </View>
-          </TouchableOpacity>
         </View>
-
         {/* メリット */}
         <View className="ml-8 mt-3">
           <Text className="font-medium mb-3 text-[#222] text-[18px]">
