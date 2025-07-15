@@ -1,5 +1,7 @@
+import { doc, setDoc } from "firebase/firestore";
 import React, { useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
+import { auth, db } from "../../lib/firebaseConfig";
 
 const options = [
   "日当たりがいい",
@@ -56,6 +58,22 @@ export default function ConditionScreen() {
         <TouchableOpacity
           className="bg-[#f1b600] rounded-lg p-5 mt-10"
           disabled={selected.length < 3}
+          onPress={async () => {
+            const user = auth.currentUser;
+            if (!user) {
+              console.log("ログインしていません");
+              return;
+            }
+            try {
+              await setDoc(doc(db, "userPreferences", user.uid), {
+                preferences: selected,
+                createdAt: new Date(),
+              });
+              console.log("登録成功");
+            } catch (error) {
+              console.error("登録失敗:", error);
+            }
+          }}
         >
           <Text className="text-center font-bold text-[#333] text-[20px]">
             登録する

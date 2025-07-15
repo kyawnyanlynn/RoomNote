@@ -1,4 +1,6 @@
 import { useRouter } from "expo-router";
+import { signInWithPhoneNumber } from "firebase/auth";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Dimensions,
@@ -14,6 +16,9 @@ import {
 import CountryPicker, { Country, CountryCode } from "react-native-country-picker-modal";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import { auth, db } from "../../lib/firebaseConfig";
+
+console.log("Auth and DB initialized:", auth, db);
 
 const screenHeight = Dimensions.get("window").height;
 
@@ -94,6 +99,19 @@ export default function LoginScreen() {
   >([]);
   const scrollRef = useRef<ScrollView>(null);
 
+  const [phoneInput, setPhoneInput] = useState("");
+  const [phone, setPhone] = useState("");
+  const [countryCode, setCountryCode] = useState<CountryCode>("JP");
+  const [callingCode, setCallingCode] = useState("81");
+  const [showNextButton, setShowNextButton] = useState(false);
+  const [confirmationResult, setConfirmationResult] = useState<any>(null);
+
+  const fakeVerifier = {
+    type: "recaptcha",
+    verify: () => Promise.resolve("test-verification-code"),
+    _reset: () => {}, // 添加空的 _reset 方法，避免 TypeError
+  };
+
   // 自动滚动到底部
   useEffect(() => {
     setTimeout(() => {
@@ -125,19 +143,58 @@ export default function LoginScreen() {
     showNext();
   }, []);
 
-  const [phone, setPhone] = useState("");
-  const [phoneInput, setPhoneInput] = useState("");
-  const [countryCode, setCountryCode] = useState<CountryCode>("JP");
-  const [callingCode, setCallingCode] = useState("81");
-
   const onSelect = (country: Country) => {
     setCountryCode(country.cca2);
     setCallingCode(country.callingCode[0]);
   };
 
-  const handleSendPhoneNumber = async () => {
-    const fullNumber = `+${callingCode}${phoneInput}`;
+  const handleSubmit = async () => {
+    const fullNumber = `+${callingCode}${phoneInput.trim()}`;
     if (phoneInput.trim() === "") return;
+
+    // 检查是否已处于等待验证码输入状态
+    if (confirmationResult) {
+      try {
+        const result = await confirmationResult.confirm(phoneInput.trim());
+        const user = result.user;
+
+        setMessages((prev) => [
+          ...prev,
+          { sender: "user", text: phoneInput.trim(), character: "flower" },
+          {
+            sender: "bot",
+            text: "ログインに成功しました！",
+            character: "tree",
+          },
+        ]);
+        setShowNextButton(true);
+        setConfirmationResult(null);
+
+        // 写入 Firestore
+        const userDocRef = doc(db, "users", user.phoneNumber || user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        if (!userDocSnap.exists()) {
+          await setDoc(userDocRef, {
+            phoneNumber: user.phoneNumber,
+            createdAt: new Date(),
+          });
+        }
+
+      } catch (e) {
+        console.error("確認失敗:", e);
+        setMessages((prev) => [
+          ...prev,
+          {
+            sender: "bot",
+            text: "確認コードが正しくありません。もう一度お試しください。",
+            character: "tree",
+          },
+        ]);
+      }
+
+      setPhoneInput("");
+      return;
+    }
 
     if (!isValidPhoneNumber(phoneInput)) {
       setMessages((prev) => [
@@ -151,17 +208,36 @@ export default function LoginScreen() {
       return;
     }
 
-    setMessages((prev) => [
-      ...prev,
-      { sender: "user", text: fullNumber, character: "flower" },
-      {
-        sender: "bot",
-        text: fullNumber.endsWith("0")
-          ? "おかえりなさい！確認コードをSMSに送信しました。"
-          : "確認コードをSMSで送信しました。",
-        character: "tree",
-      },
-    ]);
+    try {
+      const userDocRef = doc(db, "users", fullNumber);
+      const userDocSnap = await getDoc(userDocRef);
+      const isNewUser = !userDocSnap.exists();
+
+      const result = await signInWithPhoneNumber(auth, fullNumber, fakeVerifier);
+      setConfirmationResult(result);
+
+      setMessages((prev) => [
+        ...prev,
+        { sender: "user", text: fullNumber, character: "flower" },
+        {
+          sender: "bot",
+          text: isNewUser
+            ? "新規アカウントを作成しました。確認コードをSMSで送信しました。"
+            : "お帰りなさい！確認コードをSMSに送信しました。",
+          character: "tree",
+        },
+      ]);
+    } catch (error) {
+      console.error("SMS送信エラー:", error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "bot",
+          text: "エラーが発生しました。もう一度お試しください。",
+          character: "tree",
+        },
+      ]);
+    }
 
     setPhoneInput("");
   };
@@ -255,32 +331,53 @@ export default function LoginScreen() {
               );
             })}
           </ScrollView>
-          <View style={{ marginTop: 12, paddingHorizontal: 20, paddingBottom: 20 }}>
-            <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#fff", borderRadius: 6, borderWidth: 1, borderColor: "#000", paddingHorizontal: 12 }}>
-              <CountryPicker
-                countryCode={countryCode}
-                withFilter
-                withFlag
-                withCallingCode
-                withEmoji
-                withModal
-                onSelect={onSelect}
-              />
-              <Text style={{ marginLeft: 6, fontSize: 16 }}>+{callingCode}</Text>
-              <TextInput
-                style={{ fontSize: 18, color: "#000", flex: 1 }}
-                placeholder="00-0000-0000"
-                keyboardType="phone-pad"
-                value={phoneInput}
-                onChangeText={setPhoneInput}
-              />
-              <TouchableOpacity
-                onPress={handleSendPhoneNumber}
-              >
-                <MaterialIcons name="arrow-forward-ios" size={20} color="#6d8f2c" />
-              </TouchableOpacity>
+          {showNextButton && auth.currentUser && (
+            <TouchableOpacity
+              style={{
+                alignSelf: "center",
+                backgroundColor: "#94B74B",
+                paddingVertical: 14,
+                paddingHorizontal: 28,
+                borderRadius: 24,
+                marginBottom: 40,
+              }}
+              onPress={() => router.push("/conditionScreen")}
+            >
+              <Text style={{ color: "#fff", fontSize: 18 }}>次に移動</Text>
+            </TouchableOpacity>
+          )}
+          {!showNextButton && !auth.currentUser && (
+            <View style={{ marginTop: 12, paddingHorizontal: 20, paddingBottom: 20 }}>
+              <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#fff", borderRadius: 6, borderWidth: 1, borderColor: "#000", paddingHorizontal: 12 }}>
+                {!confirmationResult && (
+                  <>
+                    <CountryPicker
+                      countryCode={countryCode}
+                      withFilter
+                      withFlag
+                      withCallingCode
+                      withEmoji
+                      withModal
+                      onSelect={onSelect}
+                    />
+                    <Text style={{ marginLeft: 6, fontSize: 16 }}>+{callingCode}</Text>
+                  </>
+                )}
+                <TextInput
+                  style={{ fontSize: 18, color: "#000", flex: 1 }}
+                  placeholder={confirmationResult ? "確認コード" : "00-0000-0000"}
+                  keyboardType="phone-pad"
+                  value={phoneInput}
+                  onChangeText={setPhoneInput}
+                />
+                <TouchableOpacity
+                  onPress={handleSubmit}
+                >
+                  <MaterialIcons name="arrow-forward-ios" size={20} color="#94B74B" />
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
+          )}
         </View>
       </KeyboardAvoidingView>
       </SafeAreaView>
