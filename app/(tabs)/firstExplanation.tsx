@@ -1,5 +1,13 @@
+import { router } from "expo-router";
 import React from "react";
-import { Dimensions, Image, ScrollView, Text, View } from "react-native";
+import {
+  Dimensions,
+  Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const { width } = Dimensions.get("window");
 
@@ -23,6 +31,7 @@ export default function ExplanationPager() {
           style={{ width, flex: 1 }}
           contentContainerStyle={{ flexGrow: 1 }}
         >
+          {/* ...1ページ目の内容... */}
           <View className="flex-1 bg-[#74952F] items-center justify-start pt-4 relative">
             <View className="bg-white rounded-3xl w-[90%] px-6 pt-8 pb-10 items-center">
               <Text className="absolute left-6 top-6 text-[72px] font-bold text-[#E6F0C2] opacity-100 z-0">
@@ -54,6 +63,7 @@ export default function ExplanationPager() {
           style={{ width, flex: 1 }}
           contentContainerStyle={{ flexGrow: 1 }}
         >
+          {/* ...2ページ目の内容... */}
           <View className="flex-1 bg-[#74952F] items-center justify-start pt-4 relative">
             <View className="bg-white rounded-3xl w-[90%] px-6 pt-8 pb-10 items-center">
               <Text className="absolute left-6 top-6 text-[72px] font-bold text-[#E6F0C2] opacity-100 z-0">
@@ -114,7 +124,7 @@ export default function ExplanationPager() {
               <View className="w-2.5 h-3.5 bg-[#EAC43D] rounded-t-full rounded-b-none" />
             </View>
             {/* ログインボタン（中央揃え・下に配置） */}
-            <View
+            <TouchableOpacity
               style={{
                 width: 200,
                 height: 60,
@@ -124,14 +134,15 @@ export default function ExplanationPager() {
                 alignItems: "center",
                 alignSelf: "center",
                 marginTop: 32,
-                marginBottom: 80, // ← ここを40に変更
+                marginBottom: 80, // 必要に応じて調整
                 position: "relative",
               }}
+              onPress={() => router.replace("/login")}
             >
               <Text style={{ color: "#222", fontSize: 20, fontWeight: "bold" }}>
                 ログイン
               </Text>
-            </View>
+            </TouchableOpacity>
           </View>
         </ScrollView>
       </ScrollView>
