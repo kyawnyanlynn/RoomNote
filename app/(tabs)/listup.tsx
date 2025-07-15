@@ -87,7 +87,10 @@ export default function RoomListScreen() {
 
         {/* FAB */}
         <View style={styles.fabContainer}>
-          <TouchableOpacity style={styles.fab}>
+          <TouchableOpacity
+            style={styles.fab}
+            onPress={() => router.push("/addition")}
+          >
             <Text style={styles.fabPlus}>＋</Text>
           </TouchableOpacity>
         </View>
