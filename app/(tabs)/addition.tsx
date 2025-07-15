@@ -1,21 +1,44 @@
-import * as ImagePicker from 'expo-image-picker';
-import React, { useState } from 'react';
-import { Dimensions, Image, Modal, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import * as ImagePicker from "expo-image-picker";
+import React, { useState } from "react";
+import {
+  Dimensions,
+  Image,
+  Modal,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
-const { width } = Dimensions.get('window');
-const yellow = '#E7C75F';
+const { width } = Dimensions.get("window");
+const yellow = "#E7C75F";
 
-const backIcon = require('../../assets/images/back_icon.png');
-const nextIcon = require('../../assets/images/next_icon.png');
-const backnav = require('../../assets/images/nav_back.png');
-const nextnav = require('../../assets/images/nav_next.png');
-const houseIcon = require('../../assets/images/add_door.png');
-const defaultRoomImage = require('../../assets/images/room_sample2.jpg'); // デフォルト画像
+const backIcon = require("../../assets/images/back_icon.png");
+const nextIcon = require("../../assets/images/next_icon.png");
+const backnav = require("../../assets/images/nav_back.png");
+const nextnav = require("../../assets/images/nav_next.png");
+const houseIcon = require("../../assets/images/add_door.png");
+const defaultRoomImage = require("../../assets/images/room_sample2.jpg"); // デフォルト画像
 
 export default function PropertyDetailScreen() {
   // タグの状態
-  const [meritTags, setMeritTags] = useState(['日当たりがいい', '周りが静か', 'スーパーが近い', '家具を配置しやすそう', 'バス・トイレが綺麗']);
-  const [demeritTags, setDemeritTags] = useState(['換気しづらい', '川が近い', '病院が遠い', 'ゴミ捨て場が汚い', '隣人がうるさい']);
+  const [meritTags, setMeritTags] = useState([
+    "日当たりがいい",
+    "周りが静か",
+    "スーパーが近い",
+    "家具を配置しやすそう",
+    "バス・トイレが綺麗",
+  ]);
+  const [demeritTags, setDemeritTags] = useState([
+    "換気しづらい",
+    "川が近い",
+    "病院が遠い",
+    "ゴミ捨て場が汚い",
+    "隣人がうるさい",
+  ]);
   const [selectedMerit, setSelectedMerit] = useState<number[]>([]);
   const [selectedDemerit, setSelectedDemerit] = useState<number[]>([]);
 
@@ -29,33 +52,33 @@ export default function PropertyDetailScreen() {
   // 追加用
   const [isAddingMerit, setIsAddingMerit] = useState(false);
   const [isAddingDemerit, setIsAddingDemerit] = useState(false);
-  const [newMerit, setNewMerit] = useState('');
-  const [newDemerit, setNewDemerit] = useState('');
+  const [newMerit, setNewMerit] = useState("");
+  const [newDemerit, setNewDemerit] = useState("");
 
   const toggleMerit = (idx: number) => {
-    setSelectedMerit(prev =>
-      prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]
+    setSelectedMerit((prev) =>
+      prev.includes(idx) ? prev.filter((i) => i !== idx) : [...prev, idx]
     );
   };
 
   const toggleDemerit = (idx: number) => {
-    setSelectedDemerit(prev =>
-      prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]
+    setSelectedDemerit((prev) =>
+      prev.includes(idx) ? prev.filter((i) => i !== idx) : [...prev, idx]
     );
   };
 
   const addMeritTag = () => {
-    if (newMerit.trim() !== '') {
+    if (newMerit.trim() !== "") {
       setMeritTags([...meritTags, newMerit.trim()]);
-      setNewMerit('');
+      setNewMerit("");
       setIsAddingMerit(false);
     }
   };
 
   const addDemeritTag = () => {
-    if (newDemerit.trim() !== '') {
+    if (newDemerit.trim() !== "") {
       setDemeritTags([...demeritTags, newDemerit.trim()]);
-      setNewDemerit('');
+      setNewDemerit("");
       setIsAddingDemerit(false);
     }
   };
@@ -64,8 +87,8 @@ export default function PropertyDetailScreen() {
   const pickRoomImage = async () => {
     setShowSelectModal(false);
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      alert('写真へのアクセスが許可されていません。');
+    if (status !== "granted") {
+      alert("写真へのアクセスが許可されていません。");
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -83,8 +106,8 @@ export default function PropertyDetailScreen() {
   const takeRoomPhoto = async () => {
     setShowSelectModal(false);
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== 'granted') {
-      alert('カメラへのアクセスが許可されていません。');
+    if (status !== "granted") {
+      alert("カメラへのアクセスが許可されていません。");
       return;
     }
     const result = await ImagePicker.launchCameraAsync({
@@ -241,10 +264,19 @@ export default function PropertyDetailScreen() {
                 onSubmitEditing={addMeritTag}
                 returnKeyType="done"
               />
-              <TouchableOpacity style={styles.addTagOkButton} onPress={addMeritTag}>
+              <TouchableOpacity
+                style={styles.addTagOkButton}
+                onPress={addMeritTag}
+              >
                 <Text style={styles.addTagOkText}>追加</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.addTagCancelButton} onPress={() => { setIsAddingMerit(false); setNewMerit(''); }}>
+              <TouchableOpacity
+                style={styles.addTagCancelButton}
+                onPress={() => {
+                  setIsAddingMerit(false);
+                  setNewMerit("");
+                }}
+              >
                 <Text style={styles.addTagCancelText}>キャンセル</Text>
               </TouchableOpacity>
             </View>
@@ -289,10 +321,19 @@ export default function PropertyDetailScreen() {
                 onSubmitEditing={addDemeritTag}
                 returnKeyType="done"
               />
-              <TouchableOpacity style={styles.addTagOkButton} onPress={addDemeritTag}>
+              <TouchableOpacity
+                style={styles.addTagOkButton}
+                onPress={addDemeritTag}
+              >
                 <Text style={styles.addTagOkText}>追加</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.addTagCancelButton} onPress={() => { setIsAddingDemerit(false); setNewDemerit(''); }}>
+              <TouchableOpacity
+                style={styles.addTagCancelButton}
+                onPress={() => {
+                  setIsAddingDemerit(false);
+                  setNewDemerit("");
+                }}
+              >
                 <Text style={styles.addTagCancelText}>キャンセル</Text>
               </TouchableOpacity>
             </View>
@@ -317,7 +358,7 @@ export default function PropertyDetailScreen() {
   );
 }
 
-const IMAGE_HORIZONTAL_MARGIN = 0+ 36 + 8;
+const IMAGE_HORIZONTAL_MARGIN = 0 + 36 + 8;
 
 const styles = StyleSheet.create({
   container: {
@@ -325,39 +366,39 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFDF8",
   },
   topNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginHorizontal: 24,
     marginTop: 16,
     marginBottom: 8,
   },
   navButton: {
-    backgroundColor: '#94B74B',
+    backgroundColor: "#94B74B",
     borderRadius: 24,
     paddingHorizontal: 20,
     paddingVertical: 6,
   },
   navContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   navButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
     letterSpacing: 2,
   },
   navArrowIcon: {
     width: 20,
     height: 20,
-    resizeMode: 'contain',
+    resizeMode: "contain",
     margin: 4,
   },
   titleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginTop: 24,
     marginLeft: 32,
     marginBottom: 8,
@@ -365,43 +406,43 @@ const styles = StyleSheet.create({
   titleIcon: {
     width: 32,
     height: 32,
-    resizeMode: 'contain',
+    resizeMode: "contain",
     marginRight: 8,
   },
   titleText: {
     fontSize: 22,
-    fontWeight: '500',
-    color: '#222',
+    fontWeight: "500",
+    color: "#222",
   },
   imageSliderContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginHorizontal: 0, // ← 画像を最大化するため余白をなくす
     marginBottom: 16,
     marginTop: 8,
-    position: 'relative', // ← 重なりを許可
+    position: "relative", // ← 重なりを許可
   },
   roomImage: {
     flex: 1,
     aspectRatio: 16 / 9,
     borderRadius: 12,
-    backgroundColor: '#eee',
+    backgroundColor: "#eee",
     marginHorizontal: 32, // ← 画像を最大化するため余白をなくす
-    width: width,        // ← 画面幅いっぱいに
+    width: width, // ← 画面幅いっぱいに
     height: undefined,
-    maxWidth: width,     // ← 画面幅いっぱいに
+    maxWidth: width, // ← 画面幅いっぱいに
   },
   sliderArrowLeft: {
-    position: 'absolute',
+    position: "absolute",
     left: 8,
-    top: '50%',
+    top: "50%",
     zIndex: 2,
     transform: [{ translateY: -18 }],
   },
   sliderArrowRight: {
-    position: 'absolute',
+    position: "absolute",
     right: 8,
-    top: '50%',
+    top: "50%",
     zIndex: 2,
     transform: [{ translateY: -18 }],
   },
@@ -410,14 +451,14 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 18,
     backgroundColor: yellow,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     opacity: 0.7,
   },
   arrowIcon: {
     width: 32,
     height: 32,
-    resizeMode: 'contain',
+    resizeMode: "contain",
     opacity: 0.9,
   },
   section: {
@@ -425,41 +466,41 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   sectionTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 8,
   },
   addButton: {
     marginLeft: 8,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 16,
     borderWidth: 1,
     borderColor: yellow,
     width: 28,
     height: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   addButtonText: {
     color: yellow,
     fontSize: 22,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     lineHeight: 24,
   },
   addTagRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginTop: 8,
     marginBottom: 8,
   },
   addTagInput: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderRadius: 16,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     fontSize: 16,
     marginRight: 8,
   },
@@ -471,19 +512,19 @@ const styles = StyleSheet.create({
     marginRight: 4,
   },
   addTagOkText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: "#fff",
+    fontWeight: "bold",
     fontSize: 16,
   },
   addTagCancelButton: {
-    backgroundColor: '#eee',
+    backgroundColor: "#eee",
     borderRadius: 16,
     paddingHorizontal: 12,
     paddingVertical: 6,
   },
   addTagCancelText: {
-    color: '#888',
-    fontWeight: 'bold',
+    color: "#888",
+    fontWeight: "bold",
     fontSize: 16,
   },
   dot: {
@@ -508,62 +549,62 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '500',
-    color: '#222',
+    fontWeight: "500",
+    color: "#222",
   },
   tagsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     marginBottom: 8,
   },
   tag: {
     borderWidth: 2,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 6,
     marginRight: 12,
     marginBottom: 8,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   tagYellowBorder: {
     borderColor: yellow,
   },
   tagText: {
-    color: '#222',
+    color: "#222",
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   memoInput: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 8,
     borderWidth: 1.5,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     minHeight: 48,
     marginTop: 8,
     paddingHorizontal: 12,
     paddingVertical: 8,
     fontSize: 16,
-    color: '#222',
+    color: "#222",
   },
-    modalOverlay: {
+  modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.25)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0,0,0,0.25)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   uploadTextModal: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 16,
     padding: 24,
-    alignItems: 'center',
+    alignItems: "center",
     minWidth: 220,
   },
   uploadText: {
     fontSize: 18,
-    fontWeight: '500',
+    fontWeight: "500",
     marginBottom: 16,
-    color: '#222',
+    color: "#222",
   },
   uploadButton: {
     backgroundColor: yellow,
@@ -573,15 +614,15 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   uploadButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
-    selectModal: {
-    backgroundColor: '#fff',
+  selectModal: {
+    backgroundColor: "#fff",
     borderRadius: 16,
     padding: 24,
-    alignItems: 'center',
+    alignItems: "center",
     minWidth: 220,
   },
   selectButton: {
@@ -591,11 +632,11 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     marginVertical: 8,
     width: 160,
-    alignItems: 'center',
+    alignItems: "center",
   },
   selectButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
