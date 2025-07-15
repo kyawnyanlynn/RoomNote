@@ -34,7 +34,7 @@ export default function ExplanationScreen() {
           source={require("../../assets/images/whiteTriangle.png")}
           className="w-5 h-4"
         />
-        <View className="w-3 h-4 bg-[#EAC43D] rounded-t-full rounded-b-none" />{" "}
+        <View className="w-4 h-5 bg-[#EAC43D] rounded-t-full rounded-b-none" />
       </View>
     </View>
   );

@@ -1,15 +1,26 @@
-import React from 'react';
-import { Dimensions, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useRouter } from "expo-router";
+import React from "react";
+import {
+  Dimensions,
+  Image,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
-const userIcon = require('../../assets/images/mypage_icon.png');
-const houseIcon = require('../../assets/images/home_icon.png');
+const userIcon = require("../../assets/images/mypage_icon.png");
+const houseIcon = require("../../assets/images/home_icon.png");
+const shapesImage = require("../../assets/images/shapes2.png");
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
-const mainGreen = '#A2BC5A';
-const lightYellow = '#FDF6E0';
+const mainGreen = "#A2BC5A";
+const lightYellow = "#FDF6E0";
 
 export default function RoomListScreen() {
+  const router = useRouter();
   return (
     <View style={styles.container}>
       {/* 下部の背景 */}
@@ -29,26 +40,25 @@ export default function RoomListScreen() {
         <View style={styles.messageCard}>
           <Text style={styles.messageText}>
             まだ物件の情報が登録されていません。
-            {'\n'}下の＋ボタンから情報を追加してください。
+            {"\n"}下の＋ボタンから情報を追加してください。
           </Text>
         </View>
 
         <View style={{ flex: 1 }} />
 
-        {/* カラフルな図形（PNG画像） */}
-        <Image
-          source={require("../../assets/images/shapes2.png")}
-          style={styles.bottomImage}
-        />
+        {/* カラフルな図形 */}
+        <Image source={shapesImage} style={styles.bottomImage} />
 
         {/* ＋ボタン */}
         <View style={styles.fabContainer}>
-          <TouchableOpacity style={styles.fab}>
+          <TouchableOpacity
+            style={styles.fab}
+            onPress={() => router.push("/addition")}
+          >
             <Text style={styles.fabPlus}>＋</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
-
     </View>
   );
 }
@@ -56,10 +66,10 @@ export default function RoomListScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   bottomBackground: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     width: width,
     height: 160,
@@ -72,27 +82,27 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     marginTop: 24,
   },
+  userIconTop: {
+    width: 32,
+    height: 32,
+    resizeMode: "contain",
+    alignSelf: "flex-end",
+  },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginTop: 8,
   },
   houseIcon: {
     width: 36,
     height: 30,
-    resizeMode: 'contain',
+    resizeMode: "contain",
   },
   headerText: {
     fontSize: 22,
-    fontWeight: '500',
-    color: '#222',
+    fontWeight: "500",
+    color: "#222",
     marginLeft: 8,
-  },
-  userIconTop: {
-    width: 32,
-    height: 32,
-    resizeMode: 'contain',
-    alignSelf: 'flex-end',
   },
   messageCard: {
     backgroundColor: lightYellow,
@@ -103,24 +113,11 @@ const styles = StyleSheet.create({
   },
   messageText: {
     fontSize: 18,
-    color: '#222',
+    color: "#222",
   },
-  // shapesRow: {
-  //   flexDirection: 'row',
-  //   justifyContent: 'center',
-  //   alignItems: 'center',
-  //   marginBottom: 48,
-  //   marginTop: 0,
-  // },
-  // shapesImage: {
-  //   width: 220,
-  //   height: 48,
-  //   resizeMode: 'contain',
-  //   zIndex: 1, 
-  // },
-    bottomImage: {
+  bottomImage: {
     position: "absolute",
-    bottom: 240, // ← ここをfabContainerより上になるように調整
+    bottom: 240,
     left: 0,
     right: 0,
     marginLeft: "auto",
@@ -131,24 +128,29 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   fabContainer: {
-    position: 'absolute',
-    bottom: 80, // ← bottomImageより下になるように調整
+    position: "absolute",
+    bottom: 80,
     left: 0,
     right: 0,
-    alignItems: 'center',
+    alignItems: "center",
     zIndex: 2,
   },
   fab: {
     width: 90,
     height: 90,
     borderRadius: 45,
-    backgroundColor: "#94B74B",
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: mainGreen,
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOpacity: 0.15,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 6,
   },
   fabPlus: {
     fontSize: 48,
-    color: '#fff',
+    color: "#fff",
     lineHeight: 54,
   },
-  });
+});
