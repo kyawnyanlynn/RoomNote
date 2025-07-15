@@ -1,5 +1,5 @@
 // lib/firebaseConfig.ts
-import { initializeApp } from "firebase/app";
+import { getApp, getApps, initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
@@ -10,10 +10,10 @@ const firebaseConfig = {
   storageBucket: "roomnote-659ab.appspot.com",
   messagingSenderId: "367281777012",
   appId: "1:367281777012:web:2ed74f367641aa51c36421",
-  measurementId: "G-SLVCHHTBM8"
+  measurementId: "G-SLVCHHTBM8",
 };
 
-const app = initializeApp(firebaseConfig);
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
 const db = getFirestore(app);
 
