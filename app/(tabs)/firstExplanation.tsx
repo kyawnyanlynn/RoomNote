@@ -5,7 +5,7 @@ export default function ExplanationScreen() {
   return (
     <View className="flex-1 bg-[#7A9B4A] items-center justify-start pt-20 relative">
       {/* Title */}
-      <Text className="text-white text-2xl font-bold mb-10">
+      <Text className="text-white text-2xl font-bold mb-10 mt-9">
         アプリの使い方
       </Text>
 
@@ -29,12 +29,12 @@ export default function ExplanationScreen() {
         </Text>
       </View>
       <View className="flex-row items-center justify-center mt-8 space-x-4 gap-3">
-        <View className="w-5 h-5 bg-[#EAC43D] rounded-md" />
+        <View className="w-4 h-4 bg-[#EAC43D] rounded-md" />
         <Image
           source={require("../../assets/images/whiteTriangle.png")}
-          className="w-6 h-5"
+          className="w-5 h-4"
         />
-        <View className="w-4 h-5 bg-white rounded-t-full rounded-b-none" />{" "}
+        <View className="w-3 h-4 bg-white rounded-t-full rounded-b-none" />{" "}
       </View>
     </View>
   );
