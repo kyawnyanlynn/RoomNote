@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import { doc, setDoc } from "firebase/firestore";
 import React, { useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
@@ -16,6 +17,7 @@ const options = [
 
 export default function ConditionScreen() {
   const [selected, setSelected] = useState<string[]>([]);
+  const router = useRouter();
 
   const toggleOption = (option: string) => {
     setSelected((prev) =>
@@ -70,6 +72,7 @@ export default function ConditionScreen() {
                 createdAt: new Date(),
               });
               console.log("登録成功");
+              router.replace("/list");
             } catch (error) {
               console.error("登録失敗:", error);
             }

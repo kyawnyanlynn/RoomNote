@@ -1,6 +1,6 @@
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
-import { getApp, getApps, initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
 import { addDoc, collection, getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import React, { useState } from "react";
@@ -14,10 +14,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { firebaseConfig } from "../../firebaseConfig"; // ← ensure this exists
+import { app } from "../../firebase"; // 使用已初始化的 app
 
 const { width } = Dimensions.get("window");
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 const storage = getStorage(app);
 const db = getFirestore(app);
 
@@ -66,7 +65,14 @@ export default function PropertyDetailScreen() {
   };
   const addData = async () => {
     try {
+      const auth = getAuth(app);
+      const currentUser = auth.currentUser;
+      if (!currentUser) {
+        alert("ユーザー情報が取得できませんでした。ログイン状態を確認してください。");
+        return;
+      }
       await addDoc(collection(db, "Buildings"), {
+        uid: currentUser.uid,
         img: selectedImage,
         merit: selectedMerit.map((i) => meritTags[i]),
         demerit: selectedDemerit.map((i) => demeritTags[i]),
