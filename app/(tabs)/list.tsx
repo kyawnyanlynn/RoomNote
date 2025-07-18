@@ -9,7 +9,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
 const userIcon = require("../../assets/images/mypage_icon.png");
 const houseIcon = require("../../assets/images/home_icon.png");
 const shapesImage = require("../../assets/images/shapes2.png");
@@ -18,9 +17,35 @@ const { width } = Dimensions.get("window");
 
 const mainGreen = "#A2BC5A";
 const lightYellow = "#FDF6E0";
-
 export default function RoomListScreen() {
+  // Initial empty array of users
   const router = useRouter();
+
+  // const [loading, setLoading] = useState(true); // Set loading to true on component mount
+  // const [buildings, setBuildings] = useState([]); // Initial empty array of users
+
+  // useEffect(() => {
+  //   const subscriber = firestore()
+  //     .collection("Buildings")
+  //     .onSnapshot((querySnapshot) => {
+  //       const buildings = [];
+
+  //       querySnapshot.forEach((documentSnapshot) => {
+  //         buildings.push({
+  //           ...documentSnapshot.data(),
+  //           key: documentSnapshot.id,
+  //         });
+  //       });
+
+  //       setBuildings(buildings);
+  //       setLoading(false);
+  //     });
+
+  //   // Unsubscribe from events when no longer in use
+  //   return () => subscriber();
+  // }, []);
+  // console.log(buildings);
+  // ...
   return (
     <View style={styles.container}>
       {/* 下部の背景 */}
