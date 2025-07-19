@@ -1,83 +1,60 @@
 import * as ImagePicker from "expo-image-picker";
-<<<<<<< HEAD
-=======
 import { useRouter } from "expo-router";
 import { getApp, getApps, initializeApp } from "firebase/app";
 import { addDoc, collection, getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
->>>>>>> 341019578b36e75cf99c08d8195294222083f5a5
 import React, { useState } from "react";
 import {
   Dimensions,
   Image,
-<<<<<<< HEAD
   Modal,
   SafeAreaView,
   ScrollView,
   StyleSheet,
-=======
   SafeAreaView,
   ScrollView,
->>>>>>> 341019578b36e75cf99c08d8195294222083f5a5
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-<<<<<<< HEAD
-
+import { firebaseConfig } from "../../firebaseConfig";
 const { width } = Dimensions.get("window");
 const yellow = "#E7C75F";
-
-=======
 import { firebaseConfig } from "../../firebaseConfig"; // ← ensure this exists
-
 const { width } = Dimensions.get("window");
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-const storage = getStorage(app);
 const db = getFirestore(app);
 
-const mainGreen = "#A2BC5A";
 const yellow = "#E7C75F";
 
->>>>>>> 341019578b36e75cf99c08d8195294222083f5a5
 const backIcon = require("../../assets/images/back_icon.png");
 const nextIcon = require("../../assets/images/next_icon.png");
-const backnav = require("../../assets/images/nav_back.png");
-const nextnav = require("../../assets/images/nav_next.png");
 const houseIcon = require("../../assets/images/add_door.png");
-<<<<<<< HEAD
-const defaultRoomImage = require("../../assets/images/room_sample2.jpg"); // デフォルト画像
 
 export default function PropertyDetailScreen() {
-  // タグの状態
-=======
+ // タグの状態
 const defaultRoomImage = require("../../assets/images/room_sample2.jpg");
 
 export default function PropertyDetailScreen() {
   const router = useRouter();
 
->>>>>>> 341019578b36e75cf99c08d8195294222083f5a5
-  const [meritTags, setMeritTags] = useState([
+  const meritTags = [
     "日当たりがいい",
     "周りが静か",
     "スーパーが近い",
     "家具を配置しやすそう",
     "バス・トイレが綺麗",
-  ]);
-  const [demeritTags, setDemeritTags] = useState([
+  ];
+  const demeritTags = [
     "換気しづらい",
     "川が近い",
     "病院が遠い",
     "ゴミ捨て場が汚い",
     "隣人がうるさい",
-  ]);
+  ];
   const [selectedMerit, setSelectedMerit] = useState<number[]>([]);
   const [selectedDemerit, setSelectedDemerit] = useState<number[]>([]);
-<<<<<<< HEAD
-
-  // 画像ピッカー用
-  const [roomImageUri, setRoomImageUri] = useState<string | null>(null);
 
   // モーダル制御
   const [showUploadText, setShowUploadText] = useState(false);
@@ -86,12 +63,12 @@ export default function PropertyDetailScreen() {
   // 追加用
   const [isAddingMerit, setIsAddingMerit] = useState(false);
   const [isAddingDemerit, setIsAddingDemerit] = useState(false);
+  
   const [newMerit, setNewMerit] = useState("");
   const [newDemerit, setNewDemerit] = useState("");
-=======
+  
   const [note, setNote] = useState("");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
->>>>>>> 341019578b36e75cf99c08d8195294222083f5a5
 
   const toggleMerit = (idx: number) => {
     setSelectedMerit((prev) =>
@@ -104,7 +81,6 @@ export default function PropertyDetailScreen() {
       prev.includes(idx) ? prev.filter((i) => i !== idx) : [...prev, idx]
     );
   };
-<<<<<<< HEAD
 
   const addMeritTag = () => {
     if (newMerit.trim() !== "") {
@@ -128,7 +104,6 @@ export default function PropertyDetailScreen() {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
       alert("写真へのアクセスが許可されていません。");
-=======
   const addData = async () => {
     try {
       await addDoc(collection(db, "Buildings"), {
@@ -137,6 +112,11 @@ export default function PropertyDetailScreen() {
         demerit: selectedDemerit.map((i) => demeritTags[i]),
         note: note,
       });
+      setSelectedImage(null);
+      setSelectedMerit([]);
+      setSelectedDemerit([]);
+      setNote("");
+      router.replace("/list");
     } catch (error) {
       console.error("Error adding document: ", error);
     }
@@ -145,7 +125,6 @@ export default function PropertyDetailScreen() {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
       alert("写真ライブラリへのアクセス許可が必要です。");
->>>>>>> 341019578b36e75cf99c08d8195294222083f5a5
       return;
     }
 
@@ -155,27 +134,8 @@ export default function PropertyDetailScreen() {
       aspect: [4, 3],
       quality: 1,
     });
-
-<<<<<<< HEAD
-  // カメラで撮影
-  const takeRoomPhoto = async () => {
-    setShowSelectModal(false);
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== "granted") {
-      alert("カメラへのアクセスが許可されていません。");
-      return;
-    }
-    const result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true,
-      aspect: [16, 9],
-      quality: 0.8,
-    });
-    if (!result.canceled && result.assets && result.assets.length > 0) {
-      setRoomImageUri(result.assets[0].uri);
-=======
     if (!result.canceled && result.assets.length > 0) {
       setSelectedImage(result.assets[0].uri);
->>>>>>> 341019578b36e75cf99c08d8195294222083f5a5
     }
   };
 
@@ -184,7 +144,7 @@ export default function PropertyDetailScreen() {
       {/* Header */}
       <View className="flex-row justify-between items-center mx-6 mt-4 mb-3">
         <TouchableOpacity
-          onPress={() => router.push("/listup")}
+          onPress={() => router.push("/list")}
           className="bg-[#A2BC5A] rounded-full px-5 py-1.5"
         >
           <View className="flex-row items-center justify-center">
@@ -231,7 +191,7 @@ export default function PropertyDetailScreen() {
                 className="w-full aspect-[16/9] rounded-xl bg-gray-200"
                 style={{ maxWidth: width - 64 }}
               />
-              <Text className="text-center text-gray-500 mt-2">
+              <Text className="text-[16px] text-center text-gray-800 mt-2">
                 画像をタップして選択
               </Text>
             </TouchableOpacity>
@@ -246,7 +206,7 @@ export default function PropertyDetailScreen() {
             {meritTags.map((tag, idx) => (
               <TouchableOpacity
                 key={tag}
-                className={`border-2 rounded-full px-4 py-1 mr-2 mb-2 bg-white ${
+                className={`border-2 rounded-full px-4 py-2 mr-2 mb-2 bg-white ${
                   selectedMerit.includes(idx)
                     ? "border-[#E7C75F]"
                     : "border-gray-200"
@@ -263,7 +223,6 @@ export default function PropertyDetailScreen() {
               </TouchableOpacity>
             ))}
           </View>
-<<<<<<< HEAD
           {isAddingMerit && (
             <View style={styles.addTagRow}>
               <TextInput
@@ -292,8 +251,6 @@ export default function PropertyDetailScreen() {
               </TouchableOpacity>
             </View>
           )}
-=======
->>>>>>> 341019578b36e75cf99c08d8195294222083f5a5
         </View>
 
         {/* デメリット */}
@@ -324,7 +281,6 @@ export default function PropertyDetailScreen() {
               </TouchableOpacity>
             ))}
           </View>
-<<<<<<< HEAD
           {isAddingDemerit && (
             <View style={styles.addTagRow}>
               <TextInput
@@ -353,8 +309,6 @@ export default function PropertyDetailScreen() {
               </TouchableOpacity>
             </View>
           )}
-=======
->>>>>>> 341019578b36e75cf99c08d8195294222083f5a5
         </View>
 
         {/* 備考 */}
@@ -376,8 +330,6 @@ export default function PropertyDetailScreen() {
     </SafeAreaView>
   );
 }
-<<<<<<< HEAD
-
 const IMAGE_HORIZONTAL_MARGIN = 0 + 36 + 8;
 
 const styles = StyleSheet.create({
@@ -660,5 +612,3 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
-=======
->>>>>>> 341019578b36e75cf99c08d8195294222083f5a5
