@@ -2,7 +2,6 @@ import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { getApp, getApps, initializeApp } from "firebase/app";
 import { addDoc, collection, getFirestore } from "firebase/firestore";
-import { getStorage } from "firebase/storage";
 import React, { useState } from "react";
 import {
   Dimensions,
@@ -14,18 +13,14 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { firebaseConfig } from "../../firebaseConfig"; // ← ensure this exists
+import { firebaseConfig } from "../../firebaseConfig";
 
 const { width } = Dimensions.get("window");
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-const storage = getStorage(app);
 const db = getFirestore(app);
 
-const mainGreen = "#A2BC5A";
 const yellow = "#E7C75F";
 
-const backIcon = require("../../assets/images/back_icon.png");
-const nextIcon = require("../../assets/images/next_icon.png");
 const backnav = require("../../assets/images/nav_back.png");
 const nextnav = require("../../assets/images/nav_next.png");
 const houseIcon = require("../../assets/images/add_door.png");
@@ -34,20 +29,20 @@ const defaultRoomImage = require("../../assets/images/room_sample2.jpg");
 export default function PropertyDetailScreen() {
   const router = useRouter();
 
-  const [meritTags, setMeritTags] = useState([
+  const meritTags = [
     "日当たりがいい",
     "周りが静か",
     "スーパーが近い",
     "家具を配置しやすそう",
     "バス・トイレが綺麗",
-  ]);
-  const [demeritTags, setDemeritTags] = useState([
+  ];
+  const demeritTags = [
     "換気しづらい",
     "川が近い",
     "病院が遠い",
     "ゴミ捨て場が汚い",
     "隣人がうるさい",
-  ]);
+  ];
   const [selectedMerit, setSelectedMerit] = useState<number[]>([]);
   const [selectedDemerit, setSelectedDemerit] = useState<number[]>([]);
   const [note, setNote] = useState("");
@@ -72,6 +67,11 @@ export default function PropertyDetailScreen() {
         demerit: selectedDemerit.map((i) => demeritTags[i]),
         note: note,
       });
+      setSelectedImage(null);
+      setSelectedMerit([]);
+      setSelectedDemerit([]);
+      setNote("");
+      router.replace("/list");
     } catch (error) {
       console.error("Error adding document: ", error);
     }
@@ -100,7 +100,7 @@ export default function PropertyDetailScreen() {
       {/* Header */}
       <View className="flex-row justify-between items-center mx-6 mt-4 mb-3">
         <TouchableOpacity
-          onPress={() => router.push("/listup")}
+          onPress={() => router.push("/list")}
           className="bg-[#A2BC5A] rounded-full px-5 py-1.5"
         >
           <View className="flex-row items-center justify-center">
@@ -147,7 +147,7 @@ export default function PropertyDetailScreen() {
                 className="w-full aspect-[16/9] rounded-xl bg-gray-200"
                 style={{ maxWidth: width - 64 }}
               />
-              <Text className="text-center text-gray-500 mt-2">
+              <Text className="text-[16px] text-center text-gray-800 mt-2">
                 画像をタップして選択
               </Text>
             </TouchableOpacity>
@@ -162,7 +162,7 @@ export default function PropertyDetailScreen() {
             {meritTags.map((tag, idx) => (
               <TouchableOpacity
                 key={tag}
-                className={`border-2 rounded-full px-4 py-1 mr-2 mb-2 bg-white ${
+                className={`border-2 rounded-full px-4 py-2 mr-2 mb-2 bg-white ${
                   selectedMerit.includes(idx)
                     ? "border-[#E7C75F]"
                     : "border-gray-200"

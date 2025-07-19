@@ -1,6 +1,7 @@
+import { useFocusEffect } from "@react-navigation/native";
 import { router } from "expo-router";
 import { collection, getDocs } from "firebase/firestore";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { db } from "../../firebaseConfig";
 
 import {
@@ -15,35 +16,38 @@ import {
 const userIcon = require("../../assets/images/mypage_icon.png");
 const houseIcon = require("../../assets/images/home_icon.png");
 const shapesImage = require("../../assets/images/shapes2.png");
+const editIcon = require("../../assets/images/edit_icon.png");
 
 export default function RoomListScreen() {
   const [buildings, setBuildings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchBuildings = async () => {
-      try {
-        const snapshot = await getDocs(collection(db, "Buildings"));
-        const data = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setBuildings(data);
-      } catch (error) {
-        console.error("Error fetching buildings:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  useFocusEffect(
+    useCallback(() => {
+      const fetchBuildings = async () => {
+        try {
+          const snapshot = await getDocs(collection(db, "Buildings"));
+          const data = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setBuildings(data);
+        } catch (error) {
+          console.error("Error fetching buildings:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
 
-    fetchBuildings();
-  }, []);
+      fetchBuildings();
+    }, [])
+  );
 
   const renderItem = ({ item }: { item: any }) => (
-    <View className="flex-row bg-[#FDF6E0] rounded-2xl p-3 mb-4 mx-4 shadow-sm">
+    <View className="flex-row bg-[#FDF5D9] rounded-2xl p-3 mb-4 mx-4">
       <Image
         source={{ uri: item.img }}
-        className="w-24 h-24 rounded-xl mr-3"
+        className="w-[110px] rounded-xl mr-3"
         resizeMode="cover"
       />
       <View className="flex-1 justify-between">
@@ -52,9 +56,11 @@ export default function RoomListScreen() {
           {(item.merit || []).map((tag: string, i: number) => (
             <View
               key={`merit-${i}`}
-              className="bg-white px-3 py-1 rounded-full border border-gray-200"
+              className="bg-white px-3 py-2 rounded-full border border-[#E4C341]"
             >
-              <Text className="text-xs text-gray-800">{tag}</Text>
+              <Text className="text-[15px] font-medium text-[#222222]">
+                {tag}
+              </Text>
             </View>
           ))}
         </View>
@@ -62,17 +68,27 @@ export default function RoomListScreen() {
           {(item.demerit || []).map((tag: string, i: number) => (
             <View
               key={`demerit-${i}`}
-              className="bg-white px-3 py-1 rounded-full border border-gray-300"
+              className="bg-white px-3 py-2 rounded-full border border-[#E4C341]"
             >
-              <Text className="text-xs text-gray-600">{tag}</Text>
+              <Text className="text-[14px] font-medium text-[#222222]">
+                {tag}
+              </Text>
             </View>
           ))}
+        </View>
+        <View className="flex-row flex-wrap gap-2 mt-2">
+          <Text>メモ : {item.note}</Text>
         </View>
         {/* Score badge */}
         <View className="absolute top-0 right-0 bg-yellow-400 w-8 h-8 rounded-full items-center justify-center">
           <Text className="text-white font-bold text-sm">
             {item.score || "?"}
           </Text>
+        </View>
+        <View className="absolute bottom-0 right-0 w-8 h-8 rounded-full items-center justify-center">
+          <TouchableOpacity onPress={() => router.push("/addition")}>
+            <Image source={editIcon} className="" resizeMode="cover" />
+          </TouchableOpacity>
         </View>
       </View>
     </View>
