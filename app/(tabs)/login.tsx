@@ -3,6 +3,7 @@ import { signInWithPhoneNumber } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import React, { useEffect, useRef, useState } from "react";
 import {
+  Animated,
   Dimensions,
   Image,
   KeyboardAvoidingView,
@@ -100,11 +101,12 @@ export default function LoginScreen() {
   const scrollRef = useRef<ScrollView>(null);
 
   const [phoneInput, setPhoneInput] = useState("");
-  const [phone, setPhone] = useState("");
   const [countryCode, setCountryCode] = useState<CountryCode>("JP");
   const [callingCode, setCallingCode] = useState("81");
   const [showNextButton, setShowNextButton] = useState(false);
   const [confirmationResult, setConfirmationResult] = useState<any>(null);
+
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   const fakeVerifier = {
     type: "recaptcha",
@@ -114,9 +116,7 @@ export default function LoginScreen() {
 
   // 自动滚动到底部
   useEffect(() => {
-    setTimeout(() => {
-      scrollRef.current?.scrollToEnd({ animated: false });
-    }, 100);
+    scrollRef.current?.scrollToEnd({ animated: true });
   }, [messages]);
 
   // 初始消息
@@ -158,16 +158,27 @@ export default function LoginScreen() {
         const result = await confirmationResult.confirm(phoneInput.trim());
         const user = result.user;
 
-        setMessages((prev) => [
-          ...prev,
-          { sender: "user", text: phoneInput.trim(), character: "flower" },
-          {
-            sender: "bot",
-            text: "ログインに成功しました！",
-            character: "tree",
-          },
-        ]);
-        setShowNextButton(true);
+        setMessages((prev) => [...prev, { sender: "user", text: phoneInput.trim(), character: "flower" }]);
+        setTimeout(() => {
+          setMessages((prev) => [
+            ...prev,
+            {
+              sender: "bot",
+              text: "ログインに成功しました！",
+              character: "tree",
+            },
+          ]);
+          setTimeout(() => {
+            setShowNextButton(true); // 延迟显示按钮
+            Animated.timing(fadeAnim, {
+              toValue: 1,
+              duration: 500,
+              useNativeDriver: true,
+            }).start();
+          }, 800);
+        }, 800);
+        // setShowNextButton(true); // 已移除或注释
+
         setConfirmationResult(null);
 
         // 写入 Firestore
@@ -175,6 +186,7 @@ export default function LoginScreen() {
         const userDocSnap = await getDoc(userDocRef);
         if (!userDocSnap.exists()) {
           await setDoc(userDocRef, {
+            uid: user.uid,
             phoneNumber: user.phoneNumber,
             createdAt: new Date(),
           });
@@ -216,17 +228,19 @@ export default function LoginScreen() {
       const result = await signInWithPhoneNumber(auth, fullNumber, fakeVerifier);
       setConfirmationResult(result);
 
-      setMessages((prev) => [
-        ...prev,
-        { sender: "user", text: fullNumber, character: "flower" },
-        {
-          sender: "bot",
-          text: isNewUser
-            ? "新規アカウントを作成しました。確認コードをSMSで送信しました。"
-            : "お帰りなさい！確認コードをSMSに送信しました。",
-          character: "tree",
-        },
-      ]);
+      setMessages((prev) => [...prev, { sender: "user", text: fullNumber, character: "flower" }]);
+      setTimeout(() => {
+        setMessages((prev) => [
+          ...prev,
+          {
+            sender: "bot",
+            text: isNewUser
+              ? "新規アカウントを作成しました。確認コードをSMSで送信しました。"
+              : "お帰りなさい！確認コードをSMSに送信しました。",
+            character: "tree",
+          },
+        ]);
+      }, 800); // 延迟 800ms 回复
     } catch (error) {
       console.error("SMS送信エラー:", error);
       setMessages((prev) => [
@@ -332,19 +346,35 @@ export default function LoginScreen() {
             })}
           </ScrollView>
           {showNextButton && auth.currentUser && (
-            <TouchableOpacity
+            <Animated.View
               style={{
+                opacity: fadeAnim,
                 alignSelf: "center",
-                backgroundColor: "#94B74B",
-                paddingVertical: 14,
-                paddingHorizontal: 28,
-                borderRadius: 24,
                 marginBottom: 40,
               }}
-              onPress={() => router.push("/conditionScreen")}
             >
-              <Text style={{ color: "#fff", fontSize: 18 }}>次に移動</Text>
-            </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: "#94B74B",
+                  paddingVertical: 14,
+                  paddingHorizontal: 28,
+                  borderRadius: 24,
+                }}
+                onPress={async () => {
+                  const user = auth.currentUser;
+                  if (!user) return;
+
+                  const prefDoc = await getDoc(doc(db, "userPreferences", user.uid));
+                  if (prefDoc.exists()) {
+                    router.replace("/list"); // 偏好已存在，跳转列表页
+                  } else {
+                    router.replace("/conditionScreen"); // 无偏好，跳转设定页
+                  }
+                }}
+              >
+                <Text style={{ color: "#fff", fontSize: 18 }}>次に移動</Text>
+              </TouchableOpacity>
+            </Animated.View>
           )}
           {!showNextButton && !auth.currentUser && (
             <View style={{ marginTop: 12, paddingHorizontal: 20, paddingBottom: 20 }}>
@@ -364,7 +394,7 @@ export default function LoginScreen() {
                   </>
                 )}
                 <TextInput
-                  style={{ fontSize: 18, color: "#000", flex: 1 }}
+                  style={{ fontSize: 18, color: "#000", flex: 1, paddingVertical: 12, height: 48 }}
                   placeholder={confirmationResult ? "確認コード" : "00-0000-0000"}
                   keyboardType="phone-pad"
                   value={phoneInput}
