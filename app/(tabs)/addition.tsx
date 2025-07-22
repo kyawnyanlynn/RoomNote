@@ -1,9 +1,8 @@
 import * as ImagePicker from "expo-image-picker";
-import { useRouter } from "expo-router";
-import { getAuth } from "firebase/auth";
-import { addDoc, collection, getFirestore } from "firebase/firestore";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { addDoc, collection, doc, getDoc, updateDoc } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dimensions,
   Image,
@@ -14,11 +13,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { app } from "../../firebase"; // 使用已初始化的 app
+import { app, auth, db } from "../../firebase";
 
 const { width } = Dimensions.get("window");
 const storage = getStorage(app);
-const db = getFirestore(app);
 
 const yellow = "#E7C75F";
 
@@ -29,6 +27,9 @@ const defaultRoomImage = require("../../assets/images/room_sample2.jpg");
 
 export default function PropertyDetailScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams();
+  const id = params.id;
+  const isEditMode = !!id;
 
   const [meritTags, setMeritTags] = useState([
     "日当たりがいい",
@@ -36,7 +37,7 @@ export default function PropertyDetailScreen() {
     "スーパーが近い",
     "家具を配置しやすそう",
     "バス・トイレが綺麗",
-  ];
+  ]);
   const demeritTags = [
     "換気しづらい",
     "川が近い",
@@ -48,6 +49,34 @@ export default function PropertyDetailScreen() {
   const [selectedDemerit, setSelectedDemerit] = useState<number[]>([]);
   const [note, setNote] = useState("");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!isEditMode) return;
+      try {
+        const docRef = doc(db, "Buildings", String(id));
+        const snapshot = await getDoc(docRef);
+        if (snapshot.exists()) {
+          const data = snapshot.data();
+          setNote(data.note || "");
+          setSelectedImage(data.img || null);
+          setSelectedMerit(
+            (data.merit || [])
+              .map((tag: string) => meritTags.indexOf(tag))
+              .filter(i => i !== -1)
+          );
+          setSelectedDemerit(
+            (data.demerit || [])
+              .map((tag: string) => demeritTags.indexOf(tag))
+              .filter(i => i !== -1)
+          );
+        }
+      } catch (error) {
+        console.error("編集データ読み込みエラー:", error);
+      }
+    };
+    fetchData();
+  }, [id]);
 
   const toggleMerit = (idx: number) => {
     setSelectedMerit((prev) =>
@@ -62,26 +91,33 @@ export default function PropertyDetailScreen() {
   };
   const addData = async () => {
     try {
-      const auth = getAuth(app);
+      // already using imported 'auth'
       const currentUser = auth.currentUser;
       if (!currentUser) {
         alert("ユーザー情報が取得できませんでした。ログイン状態を確認してください。");
         return;
       }
-      await addDoc(collection(db, "Buildings"), {
+      const payload = {
         uid: currentUser.uid,
-        img: selectedImage,
+        img: selectedImage || (isEditMode && (await getDoc(doc(db, "Buildings", String(id)))).data()?.img) || null,
         merit: selectedMerit.map((i) => meritTags[i]),
         demerit: selectedDemerit.map((i) => demeritTags[i]),
         note: note,
-      });
+      };
+
+      if (isEditMode) {
+        await updateDoc(doc(db, "Buildings", String(id)), payload);
+      } else {
+        await addDoc(collection(db, "Buildings"), payload);
+      }
+
       setSelectedImage(null);
       setSelectedMerit([]);
       setSelectedDemerit([]);
       setNote("");
       router.replace("/list");
     } catch (error) {
-      console.error("Error adding document: ", error);
+      console.error("Error saving document: ", error);
     }
   };
   const handlePickImage = async () => {
@@ -111,7 +147,7 @@ export default function PropertyDetailScreen() {
           className="bg-[#A2BC5A] rounded-full px-5 py-1.5"
         >
           <View className="flex-row items-center justify-center">
-            <Image source={backnav} className="w-5 h-5" resizeMode="contain" />
+            <Image source={backIcon} className="w-5 h-5" resizeMode="contain" />
             <View className="w-5" />
             <Text className="text-white p-[3px] text-[18px] font-medium tracking-wider">
               戻る
@@ -127,7 +163,7 @@ export default function PropertyDetailScreen() {
               登録
             </Text>
             <View className="w-5" />
-            <Image source={nextnav} className="w-5 h-5" resizeMode="contain" />
+            <Image source={nextIcon} className="w-5 h-5" resizeMode="contain" />
           </View>
         </TouchableOpacity>
       </View>
