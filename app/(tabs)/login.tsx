@@ -1,7 +1,8 @@
-import { useRouter } from "expo-router";
+import { useFocusEffect } from "@react-navigation/native";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { signInWithPhoneNumber } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
@@ -95,12 +96,15 @@ const Message = ({
 
 export default function LoginScreen() {
   const router = useRouter();
+  const searchParams = useLocalSearchParams();
+  const reset = searchParams.reset === "true";
   const [messages, setMessages] = useState<
     { sender: "bot" | "user"; text: string; character?: "tree" | "flower" }[]
   >([]);
   const scrollRef = useRef<ScrollView>(null);
 
-  const [phoneInput, setPhoneInput] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
   const [countryCode, setCountryCode] = useState<CountryCode>("JP");
   const [callingCode, setCallingCode] = useState("81");
   const [showNextButton, setShowNextButton] = useState(false);
@@ -119,21 +123,37 @@ export default function LoginScreen() {
     scrollRef.current?.scrollToEnd({ animated: true });
   }, [messages]);
 
-  // 初始消息
-  useEffect(() => {
-    setMessages([]); // 清空历史消息
+  useFocusEffect(
+    useCallback(() => {
+      if (reset) {
+        resetChat();
+        setTimeout(() => {
+          showGreeting();
+        }, 100);
+      }
+    }, [reset])
+  );
+
+  const resetChat = () => {
+    setMessages([]);
+    setShowNextButton(false);
+    setPhoneNumber("");
+    setVerificationCode("");
+    setConfirmationResult(null);
+  };
+
+  const showGreeting = () => {
     const greetMsgs = [
       { sender: "bot", text: "こんにちは！お部屋探しでお困りですか？", character: "tree" as const },
       { sender: "bot", text: "RoomNoteがあなたのお部屋探しをしっかりサポートします！", character: "tree" as const },
       { sender: "bot", text: "ログインするために、電話番号を教えていただけますか？", character: "tree" as const },
     ];
+
     let idx = 0;
     const showNext = () => {
       if (idx < greetMsgs.length) {
         const msg = greetMsgs[idx];
-        if (msg) {
-          setMessages((prev) => [...prev, msg]);
-        }
+        setMessages((prev) => [...prev, msg]);
         idx++;
         if (idx < greetMsgs.length) {
           setTimeout(showNext, 600);
@@ -141,7 +161,7 @@ export default function LoginScreen() {
       }
     };
     showNext();
-  }, []);
+  };
 
   const onSelect = (country: Country) => {
     setCountryCode(country.cca2);
@@ -149,16 +169,12 @@ export default function LoginScreen() {
   };
 
   const handleSubmit = async () => {
-    const fullNumber = `+${callingCode}${phoneInput.trim()}`;
-    if (phoneInput.trim() === "") return;
-
-    // 检查是否已处于等待验证码输入状态
     if (confirmationResult) {
       try {
-        const result = await confirmationResult.confirm(phoneInput.trim());
+        const result = await confirmationResult.confirm(verificationCode.trim());
         const user = result.user;
 
-        setMessages((prev) => [...prev, { sender: "user", text: phoneInput.trim(), character: "flower" }]);
+        setMessages((prev) => [...prev, { sender: "user", text: verificationCode.trim(), character: "flower" }]);
         setTimeout(() => {
           setMessages((prev) => [
             ...prev,
@@ -177,7 +193,6 @@ export default function LoginScreen() {
             }).start();
           }, 800);
         }, 800);
-        // setShowNextButton(true); // 已移除或注释
 
         setConfirmationResult(null);
 
@@ -204,11 +219,11 @@ export default function LoginScreen() {
         ]);
       }
 
-      setPhoneInput("");
+      setVerificationCode("");
       return;
     }
 
-    if (!isValidPhoneNumber(phoneInput)) {
+    if (!isValidPhoneNumber(phoneNumber)) {
       setMessages((prev) => [
         ...prev,
         {
@@ -219,6 +234,8 @@ export default function LoginScreen() {
       ]);
       return;
     }
+
+    const fullNumber = `+${callingCode}${phoneNumber.trim()}`;
 
     try {
       const userDocRef = doc(db, "users", fullNumber);
@@ -253,7 +270,7 @@ export default function LoginScreen() {
       ]);
     }
 
-    setPhoneInput("");
+    setPhoneNumber("");
   };
 
   return (
@@ -397,8 +414,8 @@ export default function LoginScreen() {
                   style={{ fontSize: 18, color: "#000", flex: 1, paddingVertical: 12, height: 48 }}
                   placeholder={confirmationResult ? "確認コード" : "00-0000-0000"}
                   keyboardType="phone-pad"
-                  value={phoneInput}
-                  onChangeText={setPhoneInput}
+                  value={confirmationResult ? verificationCode : phoneNumber}
+                  onChangeText={confirmationResult ? setVerificationCode : setPhoneNumber}
                 />
                 <TouchableOpacity
                   onPress={handleSubmit}

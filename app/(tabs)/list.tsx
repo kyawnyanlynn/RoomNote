@@ -138,6 +138,7 @@ export default function RoomListScreen() {
           </Text>
         </View>
       </View>
+      </View> 
     </Swipeable>
   );
 
@@ -155,7 +156,19 @@ export default function RoomListScreen() {
               あなたの条件にあったお部屋
             </Text>
           </View>
-          <TouchableOpacity onPress={() => router.replace("/login")}>
+          <TouchableOpacity
+            onPress={async () => {
+              try {
+                await auth.signOut();
+                router.push({
+                  pathname: "/login",
+                  params: { reset: "true" },
+                });
+              } catch (error) {
+                console.error("ログアウトエラー:", error);
+              }
+            }}
+          >
             <Text className="text-lg">ログアウト</Text>
           </TouchableOpacity>
         </View>
