@@ -1,6 +1,12 @@
 import { useFocusEffect } from "@react-navigation/native";
 import { router } from "expo-router";
-import { collection, deleteDoc, doc, getDoc, getDocs } from "firebase/firestore";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+} from "firebase/firestore";
 import React, { useCallback, useState } from "react";
 import { Swipeable } from "react-native-gesture-handler";
 import { auth } from "../../firebase";
@@ -47,18 +53,19 @@ export default function RoomListScreen() {
           const data = snapshot.docs
             .map((doc) => {
               const building = { id: doc.id, ...doc.data() };
-              const matched = Array.from(new Set((building.merit || []).filter((m: string) =>
-                userPoints.includes(m)
-              )));
+              const matched = Array.from(
+                new Set(
+                  (building.merit || []).filter((m: string) =>
+                    userPoints.includes(m)
+                  )
+                )
+              );
               const matchScore =
                 userPoints.length > 0 && matched.length > 0
-                  ? Math.round((matched.length / userPoints.length) * 100)
+                  ? (matched.length / userPoints.length) * 5
                   : 0;
-              console.log("Building merits:", building.merit);
-              console.log("User points:", userPoints);
-              console.log("Matched merits:", matched);
-              console.log("Score:", matchScore);
-              return { ...building, score: matchScore };
+
+              return { ...building, score: parseFloat(matchScore.toFixed(1)) };
             })
             .filter((doc) => doc.uid === userId);
 
@@ -127,15 +134,11 @@ export default function RoomListScreen() {
           <View className="flex-row flex-wrap gap-2 mt-2">
             <Text>メモ : {item.note}</Text>
           </View>
-          <View className="absolute top-0 right-0 bg-yellow-400 w-8 h-8 rounded-full items-center justify-center">
-            <Text className="text-white font-bold text-sm">
-              {item.score || "?"}
+          <View className="absolute bottom-0 right-0 bg-yellow-400 w-10 h-10 rounded-full items-center justify-center">
+            <Text className="text-white font-bold text-sm text-center">
+              {typeof item.score === "number" ? `${item.score}/5` : "?"}
             </Text>
           </View>
-        <View className="absolute top-0 right-0 bg-yellow-400 w-10 h-10 rounded-full items-center justify-center">
-          <Text className="text-white font-bold text-sm text-center">
-            {typeof item.score === "number" ? `${item.score}%` : "?"}
-          </Text>
         </View>
       </View>
       </View> 

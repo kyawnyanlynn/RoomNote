@@ -35,11 +35,13 @@ export default function PropertyDetailScreen() {
     "日当たりがいい",
     "周りが静か",
     "スーパーが近い",
-    "家具の配置がしやすい",
-    "バス・トイレが綺麗",
     "病院が近い",
     "24時間ゴミ捨て可能",
+    "バス・トイレが綺麗",
     "コンセントが多い",
+    "家具の配置がしやすい",
+    "ペット可",
+    "インターネット無料",
   ]);
   const [demeritTags, setDemeritTags] = useState([
     "換気しづらい",
@@ -47,6 +49,11 @@ export default function PropertyDetailScreen() {
     "病院が遠い",
     "ゴミ捨て場が汚い",
     "隣人がうるさい",
+    "キッチンが狭い",
+    "収納が少ない",
+    "ペット不可",
+    "ネット有料",
+    "駅から遠い",
   ]);
   const [selectedMerit, setSelectedMerit] = useState<number[]>([]);
   const [selectedDemerit, setSelectedDemerit] = useState<number[]>([]);
