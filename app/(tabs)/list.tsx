@@ -1,6 +1,6 @@
 import { useFocusEffect } from "@react-navigation/native";
 import { router } from "expo-router";
-import { collection, deleteDoc, doc, getDocs } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDoc, getDocs } from "firebase/firestore";
 import React, { useCallback, useState } from "react";
 import { Swipeable } from "react-native-gesture-handler";
 import { auth } from "../../firebase";
@@ -21,24 +21,47 @@ const shapesImage = require("../../assets/images/shapes2.png");
 export default function RoomListScreen() {
   const [buildings, setBuildings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [importantPoints, setImportantPoints] = useState<string[]>([]);
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = useCallback(async (id: string) => {
     try {
       await deleteDoc(doc(db, "Buildings", id));
       setBuildings((prev) => prev.filter((b) => b.id !== id));
     } catch (error) {
       console.error("削除エラー:", error);
     }
-  };
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
       const fetchBuildings = async () => {
         try {
+          const userId = auth.currentUser?.uid;
+          const userDoc = await getDoc(doc(db, "userPreferences", userId));
+          const userData = userDoc.exists() ? userDoc.data() : {};
+          const userPoints = userData.preferences || [];
+
+          setImportantPoints(userPoints);
+
           const snapshot = await getDocs(collection(db, "Buildings"));
           const data = snapshot.docs
-            .map((doc) => ({ id: doc.id, ...doc.data() }))
-            .filter((doc) => doc.uid === auth.currentUser?.uid);
+            .map((doc) => {
+              const building = { id: doc.id, ...doc.data() };
+              const matched = Array.from(new Set((building.merit || []).filter((m: string) =>
+                userPoints.includes(m)
+              )));
+              const matchScore =
+                userPoints.length > 0 && matched.length > 0
+                  ? Math.round((matched.length / userPoints.length) * 100)
+                  : 0;
+              console.log("Building merits:", building.merit);
+              console.log("User points:", userPoints);
+              console.log("Matched merits:", matched);
+              console.log("Score:", matchScore);
+              return { ...building, score: matchScore };
+            })
+            .filter((doc) => doc.uid === userId);
+
           setBuildings(data);
         } catch (error) {
           console.error("Error fetching buildings:", error);
@@ -109,6 +132,10 @@ export default function RoomListScreen() {
               {item.score || "?"}
             </Text>
           </View>
+        <View className="absolute top-0 right-0 bg-yellow-400 w-10 h-10 rounded-full items-center justify-center">
+          <Text className="text-white font-bold text-sm text-center">
+            {typeof item.score === "number" ? `${item.score}%` : "?"}
+          </Text>
         </View>
       </View>
     </Swipeable>
