@@ -98,6 +98,7 @@ export default function LoginScreen() {
   const router = useRouter();
   const searchParams = useLocalSearchParams();
   const reset = searchParams.reset === "true";
+  const [isFirstVisit, setIsFirstVisit] = useState(true);
   const [messages, setMessages] = useState<
     { sender: "bot" | "user"; text: string; character?: "tree" | "flower" }[]
   >([]);
@@ -129,9 +130,12 @@ export default function LoginScreen() {
         resetChat();
         setTimeout(() => {
           showGreeting();
-        }, 100);
+        }, 300);
+      } else if (isFirstVisit) {
+        showGreeting();
+        setIsFirstVisit(false);
       }
-    }, [reset])
+    }, [reset, isFirstVisit])
   );
 
   const resetChat = () => {
@@ -140,6 +144,7 @@ export default function LoginScreen() {
     setPhoneNumber("");
     setVerificationCode("");
     setConfirmationResult(null);
+    scrollRef.current?.scrollTo({ y: 0, animated: false });
   };
 
   const showGreeting = () => {
