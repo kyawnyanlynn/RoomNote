@@ -35,8 +35,11 @@ export default function PropertyDetailScreen() {
     "日当たりがいい",
     "周りが静か",
     "スーパーが近い",
-    "家具を配置しやすそう",
+    "家具の配置がしやすい",
     "バス・トイレが綺麗",
+    "病院が近い",
+    "24時間ゴミ捨て可能",
+    "コンセントが多い",
   ]);
   const demeritTags = [
     "換気しづらい",
@@ -56,6 +59,7 @@ export default function PropertyDetailScreen() {
       try {
         const docRef = doc(db, "Buildings", String(id));
         const snapshot = await getDoc(docRef);
+        console.log("Editing document data:", snapshot.data());
         if (snapshot.exists()) {
           const data = snapshot.data();
           setNote(data.note || "");
@@ -106,6 +110,7 @@ export default function PropertyDetailScreen() {
       };
 
       if (isEditMode) {
+        console.log("Updating document with payload:", payload);
         await updateDoc(doc(db, "Buildings", String(id)), payload);
       } else {
         await addDoc(collection(db, "Buildings"), payload);
