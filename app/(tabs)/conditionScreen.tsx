@@ -13,6 +13,8 @@ const options = [
   "バス・トイレが綺麗",
   "コンセントが多い",
   "家具の配置がしやすい",
+  "ペット可",
+  "インターネット無料",
 ];
 
 export default function ConditionScreen() {
