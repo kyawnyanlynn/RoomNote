@@ -15,10 +15,8 @@ import {
   View,
 } from "react-native";
 
-const userIcon = require("../../assets/images/mypage_icon.png");
-const houseIcon = require("../../assets/images/home_icon.png");
+const doorIcon = require("../../assets/images/add_door.png");
 const shapesImage = require("../../assets/images/shapes2.png");
-const editIcon = require("../../assets/images/edit_icon.png");
 
 export default function RoomListScreen() {
   const [buildings, setBuildings] = useState<any[]>([]);
@@ -77,91 +75,89 @@ export default function RoomListScreen() {
   );
 
   const renderItem = ({ item }: { item: any }) => (
-  <Swipeable
-    renderRightActions={() => (
-      <View className="flex-row h-full pb-5">
-        <TouchableOpacity
-          onPress={() => router.push(`/addition?id=${item.id}`)}
-          className="bg-green-400 w-16 h-full pb-5 items-center justify-center rounded-l-xl"
-        >
-          <Text className="text-white font-bold">編集</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => handleDelete(item.id)}
-          className="bg-yellow-500 w-16 h-full pb-5 items-center justify-center rounded-r-xl"
-        >
-          <Text className="text-white font-bold">削除</Text>
-        </TouchableOpacity>
-      </View>
-    )}
-  >
-    <View className="flex-row bg-[#FDF5D9] rounded-2xl p-3 mb-4 mx-4">
-      <Image
-        source={{ uri: item.img }}
-        className="w-[110px] rounded-xl mr-3"
-        resizeMode="cover"
-      />
-      <View className="flex-1 justify-between">
-        <View className="flex-row flex-wrap gap-2 mb-2">
-          {(item.merit || []).map((tag: string, i: number) => (
-            <View
-              key={`merit-${i}`}
-              className="bg-white px-3 py-2 rounded-full border border-[#E4C341]"
-            >
-              <Text className="text-[15px] font-medium text-[#222222]">
-                {tag}
-              </Text>
-            </View>
-          ))}
+    <Swipeable
+      renderRightActions={() => (
+        <View className="flex-row h-full pb-5">
+          <TouchableOpacity
+            onPress={() => router.push(`/addition?id=${item.id}`)}
+            className="bg-green-400 w-16 h-full pb-5 items-center justify-center rounded-l-xl"
+          >
+            <Text className="text-white font-bold">編集</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => handleDelete(item.id)}
+            className="bg-yellow-500 w-16 h-full pb-5 items-center justify-center rounded-r-xl"
+          >
+            <Text className="text-white font-bold">削除</Text>
+          </TouchableOpacity>
         </View>
-        <View className="flex-row flex-wrap gap-2">
-          {(item.demerit || []).map((tag: string, i: number) => (
-            <View
-              key={`demerit-${i}`}
-              className="bg-white px-3 py-2 rounded-full border border-[#E4C341]"
-            >
-              <Text className="text-[14px] font-medium text-[#222222]">
-                {tag}
-              </Text>
-            </View>
-          ))}
-        </View>
-        <View className="flex-row flex-wrap gap-2 mt-2">
-          <Text>メモ : {item.note}</Text>
-        </View>
+      )}
+    >
+      <View className="flex-row bg-[#FDF5D9] rounded-2xl p-3 mb-4 mx-4">
+        <Image
+          source={{ uri: item.img }}
+          className="w-[110px] rounded-xl mr-3"
+          resizeMode="cover"
+        />
+        <View className="flex-1 justify-between">
+          <View className="flex-row flex-wrap gap-2 mb-2">
+            {(item.merit || []).map((tag: string, i: number) => (
+              <View
+                key={`merit-${i}`}
+                className="bg-white px-3 py-2 rounded-full border border-[#E4C341]"
+              >
+                <Text className="text-[15px] font-medium text-[#222222]">
+                  {tag}
+                </Text>
+              </View>
+            ))}
+          </View>
+          <View className="flex-row flex-wrap gap-2">
+            {(item.demerit || []).map((tag: string, i: number) => (
+              <View
+                key={`demerit-${i}`}
+                className="bg-white px-3 py-2 rounded-full border border-[#E4C341]"
+              >
+                <Text className="text-[14px] font-medium text-[#222222]">
+                  {tag}
+                </Text>
+              </View>
+            ))}
+          </View>
+          <View className="flex-row flex-wrap gap-2 mt-2">
+            <Text>メモ : {item.note}</Text>
+          </View>
+          <View className="absolute top-0 right-0 bg-yellow-400 w-8 h-8 rounded-full items-center justify-center">
+            <Text className="text-white font-bold text-sm">
+              {item.score || "?"}
+            </Text>
+          </View>
         <View className="absolute top-0 right-0 bg-yellow-400 w-10 h-10 rounded-full items-center justify-center">
           <Text className="text-white font-bold text-sm text-center">
             {typeof item.score === "number" ? `${item.score}%` : "?"}
           </Text>
         </View>
       </View>
-    </View>
-  </Swipeable>
-);
+    </Swipeable>
+  );
 
   return (
     <View className="flex-1 bg-white relative">
       {/* Bottom background */}
-      <View className="absolute bottom-0 w-full h-40 bg-[#FDF6E0] rounded-t-[80px] z-0" />
+      <View />
 
       <SafeAreaView className="flex-1">
         {/* Header */}
-        <View className="px-6 mt-6">
-          <Image
-            source={userIcon}
-            className="w-8 h-8 self-end"
-            resizeMode="contain"
-          />
+        <View className="flex flex-row justify-between items-center pl-3 pr-3">
           <View className="flex-row items-center mt-2">
-            <Image
-              source={houseIcon}
-              className="w-9 h-7"
-              resizeMode="contain"
-            />
-            <Text className="ml-2 text-xl font-medium text-gray-800">
+            <Image source={doorIcon} className="w-9 h-7" resizeMode="contain" />
+            <Text className="text-gray-800 text-[16px] font-semibold">
               あなたの条件にあったお部屋
             </Text>
           </View>
+          <TouchableOpacity onPress={() => router.replace("/login")}>
+            <Text className="text-lg">ログアウト</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Content */}

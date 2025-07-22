@@ -20,8 +20,8 @@ const storage = getStorage(app);
 
 const yellow = "#E7C75F";
 
-const backIcon = require("../../assets/images/back_icon.png");
-const nextIcon = require("../../assets/images/next_icon.png");
+const backIcon = require("../../assets/images/nav_back.png");
+const nextIcon = require("../../assets/images/nav_next.png");
 const houseIcon = require("../../assets/images/add_door.png");
 const defaultRoomImage = require("../../assets/images/room_sample2.jpg");
 
@@ -41,13 +41,13 @@ export default function PropertyDetailScreen() {
     "24時間ゴミ捨て可能",
     "コンセントが多い",
   ]);
-  const demeritTags = [
+  const [demeritTags, setDemeritTags] = useState([
     "換気しづらい",
     "川が近い",
     "病院が遠い",
     "ゴミ捨て場が汚い",
     "隣人がうるさい",
-  ];
+  ]);
   const [selectedMerit, setSelectedMerit] = useState<number[]>([]);
   const [selectedDemerit, setSelectedDemerit] = useState<number[]>([]);
   const [note, setNote] = useState("");
@@ -67,12 +67,12 @@ export default function PropertyDetailScreen() {
           setSelectedMerit(
             (data.merit || [])
               .map((tag: string) => meritTags.indexOf(tag))
-              .filter(i => i !== -1)
+              .filter((i) => i !== -1)
           );
           setSelectedDemerit(
             (data.demerit || [])
               .map((tag: string) => demeritTags.indexOf(tag))
-              .filter(i => i !== -1)
+              .filter((i) => i !== -1)
           );
         }
       } catch (error) {
@@ -98,12 +98,18 @@ export default function PropertyDetailScreen() {
       // already using imported 'auth'
       const currentUser = auth.currentUser;
       if (!currentUser) {
-        alert("ユーザー情報が取得できませんでした。ログイン状態を確認してください。");
+        alert(
+          "ユーザー情報が取得できませんでした。ログイン状態を確認してください。"
+        );
         return;
       }
       const payload = {
         uid: currentUser.uid,
-        img: selectedImage || (isEditMode && (await getDoc(doc(db, "Buildings", String(id)))).data()?.img) || null,
+        img:
+          selectedImage ||
+          (isEditMode &&
+            (await getDoc(doc(db, "Buildings", String(id)))).data()?.img) ||
+          null,
         merit: selectedMerit.map((i) => meritTags[i]),
         demerit: selectedDemerit.map((i) => demeritTags[i]),
         note: note,
