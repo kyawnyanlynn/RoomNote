@@ -141,7 +141,6 @@ export default function RoomListScreen() {
           </View>
         </View>
       </View>
-      </View> 
     </Swipeable>
   );
 
