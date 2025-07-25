@@ -15,19 +15,21 @@ import { db } from "../../firebaseConfig";
 import {
   FlatList,
   Image,
+  Modal,
   SafeAreaView,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 
-const doorIcon = require("../../assets/images/add_door.png");
+const yellowCharacter = require("../../assets/images/yellow-character.png");
 const shapesImage = require("../../assets/images/shapes2.png");
 
 export default function RoomListScreen() {
   const [buildings, setBuildings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [importantPoints, setImportantPoints] = useState<string[]>([]);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const handleDelete = useCallback(async (id: string) => {
     try {
@@ -100,46 +102,61 @@ export default function RoomListScreen() {
         </View>
       )}
     >
-      <View className="flex-row bg-[#FDF5D9] rounded-2xl p-3 mb-4 mx-4">
-        <Image
-          source={{ uri: item.img }}
-          className="w-[110px] rounded-xl mr-3"
-          resizeMode="cover"
-        />
-        <View className="flex-1 justify-between">
-          <View className="flex-row flex-wrap gap-2 mb-2">
-            {(item.merit || []).map((tag: string, i: number) => (
-              <View
-                key={`merit-${i}`}
-                className="bg-white px-3 py-2 rounded-full border border-[#E4C341]"
-              >
-                <Text className="text-[15px] font-medium text-[#222222]">
-                  {tag}
-                </Text>
-              </View>
-            ))}
-          </View>
-          <View className="flex-row flex-wrap gap-2">
-            {(item.demerit || []).map((tag: string, i: number) => (
-              <View
-                key={`demerit-${i}`}
-                className="bg-white px-3 py-2 rounded-full border border-[#E4C341]"
-              >
-                <Text className="text-[14px] font-medium text-[#222222]">
-                  {tag}
-                </Text>
-              </View>
-            ))}
-          </View>
-          <View className="flex-row flex-wrap gap-2 mt-2">
-            <Text>メモ : {item.note}</Text>
-          </View>
-          <View className="absolute bottom-0 right-0 bg-yellow-400 w-10 h-10 rounded-full items-center justify-center">
-            <Text className="text-white font-bold text-sm text-center">
+      <View
+        style={{
+          shadowColor: "#C4C8BE", // your custom shadow color
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.5,
+          shadowRadius: 6,
+          backgroundColor: "white",
+          borderRadius: 16,
+          marginHorizontal: 16,
+          padding: 16,
+          marginBottom: 24,
+        }}
+      >
+        <View className="relative">
+          <Image
+            source={{ uri: item.img }}
+            className="w-full h-48 rounded-xl mb-4"
+            resizeMode="cover"
+          />
+          <View className="absolute top-3 right-3 bg-yellow-400 w-16 h-16 rounded-full items-center justify-center">
+            <Text className="text-white font-medium text-[20px]">
               {typeof item.score === "number" ? `${item.score}/5` : "?"}
             </Text>
           </View>
         </View>
+
+        <View className="flex-row flex-wrap gap-2 mb-2">
+          {(item.merit || []).map((tag: string, i: number) => (
+            <View
+              key={`merit-${i}`}
+              className="bg-[#FFF6D9] px-3 py-2 rounded-[10px]"
+            >
+              <Text className="text-[20px] font-medium text-[#222222]">
+                {tag}
+              </Text>
+            </View>
+          ))}
+        </View>
+
+        <View className="flex-row flex-wrap gap-2 mb-2">
+          {(item.demerit || []).map((tag: string, i: number) => (
+            <View
+              key={`demerit-${i}`}
+              className="bg-[#F2F2F2] px-3 py-2 rounded-[10px]"
+            >
+              <Text className="text-[20px] font-medium text-[#222222]">
+                {tag}
+              </Text>
+            </View>
+          ))}
+        </View>
+
+        <Text className="text-[16px] text-[#444444] mt-2">
+          メモ : {item.note}
+        </Text>
       </View>
     </Swipeable>
   );
@@ -151,28 +168,69 @@ export default function RoomListScreen() {
 
       <SafeAreaView className="flex-1">
         {/* Header */}
-        <View className="flex flex-row justify-between items-center pl-3 pr-3">
+        <View className="flex-row justify-end items-center px-4 pt-4">
+          <TouchableOpacity
+            onPress={() => setShowLogoutConfirm(true)}
+            className="border border-[#94B74B] px-4 py-2 rounded-full"
+          >
+            <Text className="text-[#000000] text-[18px] font-medium">
+              ログアウト
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Logout Confirmation Modal */}
+        {showLogoutConfirm && (
+          <Modal transparent animationType="fade" visible>
+            <View className="flex-1 justify-center items-center bg-black/40">
+              <View className="bg-[#FFFEF7] rounded-xl px-5 py-16 w-[80%] border-[2px] border-[#94B74B] items-center">
+                <Text className="text-[24px] font-normal mb-6">
+                  ログアウトしますか？
+                </Text>
+                <View className="flex-row gap-4">
+                  <TouchableOpacity
+                    className="bg-[#94B74B] px-12 py-3 rounded-md"
+                    onPress={async () => {
+                      setShowLogoutConfirm(false); // Close modal first
+                      try {
+                        await auth.signOut();
+                        router.push({
+                          pathname: "/login",
+                          params: { reset: "true" },
+                        });
+                      } catch (error) {
+                        console.error("ログアウトエラー:", error);
+                      }
+                    }}
+                  >
+                    <Text className="text-black text-[20px] font-normal">
+                      はい
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    className="bg-[#FCDC5A] px-12 py-3 rounded-md"
+                    onPress={() => setShowLogoutConfirm(false)}
+                  >
+                    <Text className="text-black text-[20px] font-normal">
+                      いいえ
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+        )}
+        <View className="flex flex-row justify-between items-center pl-3 pr-3 mb-2">
           <View className="flex-row items-center mt-2">
-            <Image source={doorIcon} className="w-9 h-7" resizeMode="contain" />
-            <Text className="text-gray-800 text-[16px] font-semibold">
+            <Image
+              source={yellowCharacter}
+              className="w-20 h-16"
+              resizeMode="contain"
+            />
+            <Text className="text-gray-800 text-[25px] font-medium">
               あなたの条件にあったお部屋
             </Text>
           </View>
-          <TouchableOpacity
-            onPress={async () => {
-              try {
-                await auth.signOut();
-                router.push({
-                  pathname: "/login",
-                  params: { reset: "true" },
-                });
-              } catch (error) {
-                console.error("ログアウトエラー:", error);
-              }
-            }}
-          >
-            <Text className="text-lg">ログアウト</Text>
-          </TouchableOpacity>
         </View>
 
         {/* Content */}
