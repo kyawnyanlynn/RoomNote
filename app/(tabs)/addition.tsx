@@ -167,7 +167,7 @@ export default function PropertyDetailScreen() {
           <View className="flex-row items-center justify-center">
             <Image source={backIcon} className="w-5 h-5" resizeMode="contain" />
             <View className="w-5" />
-            <Text className="text-white p-[3px] text-[18px] font-medium tracking-wider">
+            <Text className="text-white p-[3px] text-[20px] font-medium tracking-wider">
               戻る
             </Text>
           </View>
@@ -177,8 +177,8 @@ export default function PropertyDetailScreen() {
           onPress={addData}
         >
           <View className="flex-row items-center justify-center">
-            <Text className="text-white p-[3px] text-[18px] font-medium tracking-wider">
-              登録
+            <Text className="text-white p-[3px] text-[20px] font-medium tracking-wider">
+              追加
             </Text>
             <View className="w-5" />
             <Image source={nextIcon} className="w-5 h-5" resizeMode="contain" />
@@ -216,8 +216,8 @@ export default function PropertyDetailScreen() {
         </View>
         {/* メリット */}
         <View className="ml-8 mt-3">
-          <Text className="font-medium mb-3 text-[#222] text-[18px]">
-            <Text style={{ color: yellow, fontSize: 18 }}>●</Text> メリット
+          <Text className="font-medium mb-3 text-[#222] text-[22px]">
+            <Text style={{ color: yellow, fontSize: 20 }}>●</Text> メリット
           </Text>
           <View className="flex-row flex-wrap mb-1">
             {meritTags.map((tag, idx) => (
@@ -231,7 +231,7 @@ export default function PropertyDetailScreen() {
                 onPress={() => toggleMerit(idx)}
               >
                 <Text
-                  className={`text-[15px] p-[3px] ${
+                  className={`text-[18px] p-[3px] ${
                     selectedMerit.includes(idx) ? "text-[#222]" : "text-[#222]"
                   }`}
                 >
@@ -244,8 +244,8 @@ export default function PropertyDetailScreen() {
 
         {/* デメリット */}
         <View className="ml-8 mt-5">
-          <Text className="font-medium mb-3 text-[#222] text-[18px]">
-            <Text style={{ color: yellow, fontSize: 18 }}>▲</Text> デメリット
+          <Text className="font-medium mb-3 text-[#222] text-[22px]">
+            <Text style={{ color: yellow, fontSize: 20 }}>▲</Text> デメリット
           </Text>
           <View className="flex-row flex-wrap mb-1">
             {demeritTags.map((tag, idx) => (
@@ -259,7 +259,7 @@ export default function PropertyDetailScreen() {
                 onPress={() => toggleDemerit(idx)}
               >
                 <Text
-                  className={`text-[16px] p-[3px] ${
+                  className={`text-[18px] p-[3px] ${
                     selectedDemerit.includes(idx)
                       ? "text-[#222]"
                       : "text-[#222]"
@@ -274,8 +274,8 @@ export default function PropertyDetailScreen() {
 
         {/* 備考 */}
         <View className="ml-8 mt-6 mr-8">
-          <Text className="font-medium mb-3 text-[#222] text-[18px]">
-            <Text style={{ color: yellow, fontSize: 18 }}>■</Text>備考
+          <Text className="font-medium mb-3 text-[#222] text-[22px]">
+            <Text style={{ color: yellow, fontSize: 20 }}>■</Text>備考
           </Text>
           <TextInput
             className="border-2 border-[#A2BC5A] rounded-lg p-3 text-[15px] bg-white min-h-[60px] mt-1"

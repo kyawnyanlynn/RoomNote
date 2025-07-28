@@ -44,7 +44,7 @@ export default function ExplanationPager() {
                   resizeMode="contain"
                 />
               </View>
-              <Text className="text-black text-xl font-medium text-left mt-0">
+              <Text className="text-black text-[22px] font-medium text-left mt-0">
                 お部屋選びで重視している条件を選択する
               </Text>
             </View>
@@ -76,7 +76,7 @@ export default function ExplanationPager() {
                   resizeMode="contain"
                 />
               </View>
-              <Text className="text-black text-xl font-medium text-left mt-0">
+              <Text className="text-black text-[22px] font-medium text-left mt-0">
                 条件に合ったお部屋を自動でリストアップ！
               </Text>
             </View>
@@ -111,7 +111,7 @@ export default function ExplanationPager() {
                   resizeMode="contain"
                 />
               </View>
-              <Text className="text-black text-xl font-medium text-left mt-0">
+              <Text className="text-black text-[22px] font-medium text-left mt-0">
                 あなたの条件とのマッチ度で 点数を表示！
               </Text>
             </View>
