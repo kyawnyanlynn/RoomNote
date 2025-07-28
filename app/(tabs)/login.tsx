@@ -291,7 +291,7 @@ export default function LoginScreen() {
       >
         <View
           style={{
-            height: screenHeight * 0.80,
+            height: screenHeight * 0.88,
             width: "92%",
             backgroundColor: "#FFFFF2",
             borderTopLeftRadius: 24,

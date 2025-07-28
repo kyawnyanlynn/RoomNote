@@ -32,16 +32,19 @@ export default function PropertyDetailScreen() {
   const isEditMode = !!id;
 
   const [meritTags, setMeritTags] = useState([
-    "日当たりがいい",
-    "周りが静か",
-    "スーパーが近い",
-    "病院が近い",
-    "24時間ゴミ捨て可能",
-    "バス・トイレが綺麗",
-    "コンセントが多い",
-    "家具の配置がしやすい",
-    "ペット可",
-    "インターネット無料",
+      "日当たりがいい",
+      "ペット可",
+      "周りが静か",
+      "スーパーが近い",
+      "病院が近い",
+      "24時間ゴミ捨て可能",
+      "バス・トイレが綺麗",
+      "オートロック",
+      "コンセントが多い",
+      "インターネット無料",
+      "防犯カメラ",
+      "宅配ボックス",
+      "家具の配置しやすい",
   ]);
   const [demeritTags, setDemeritTags] = useState([
     "換気しづらい",
@@ -159,7 +162,7 @@ export default function PropertyDetailScreen() {
   return (
     <SafeAreaView className="flex-1 bg-[#FFFDF8]">
       {/* Header */}
-      <View className="flex-row justify-between items-center mx-6 mt-4 mb-3">
+      <View className="flex-row justify-between items-center mx-6 mt-4 mb-8">
         <TouchableOpacity
           onPress={() => router.push("/list")}
           className="bg-[#A2BC5A] rounded-full px-5 py-1.5"
@@ -188,7 +191,7 @@ export default function PropertyDetailScreen() {
 
       <ScrollView contentContainerStyle={{ paddingBottom: 32 }}>
         {/* Title */}
-        <View className="flex-row items-center mt-3 ml-8 mb-2">
+        <View className="flex-row items-center mt-3 ml-8 mb-6">
           <Image
             source={houseIcon}
             className="w-8 h-8 mr-2"
@@ -216,7 +219,7 @@ export default function PropertyDetailScreen() {
         </View>
         {/* メリット */}
         <View className="ml-8 mt-3">
-          <Text className="font-medium mb-3 text-[#222] text-[22px]">
+          <Text className="font-medium mb-4 text-[#222] text-[22px]">
             <Text style={{ color: yellow, fontSize: 20 }}>●</Text> メリット
           </Text>
           <View className="flex-row flex-wrap mb-1">
@@ -231,7 +234,7 @@ export default function PropertyDetailScreen() {
                 onPress={() => toggleMerit(idx)}
               >
                 <Text
-                  className={`text-[18px] p-[3px] ${
+                  className={`text-[16px] p-[1.5px] ${
                     selectedMerit.includes(idx) ? "text-[#222]" : "text-[#222]"
                   }`}
                 >
@@ -259,7 +262,7 @@ export default function PropertyDetailScreen() {
                 onPress={() => toggleDemerit(idx)}
               >
                 <Text
-                  className={`text-[18px] p-[3px] ${
+                  className={`text-[16px] p-[3px] ${
                     selectedDemerit.includes(idx)
                       ? "text-[#222]"
                       : "text-[#222]"

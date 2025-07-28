@@ -30,6 +30,7 @@ export default function RoomListScreen() {
   const [loading, setLoading] = useState(true);
   const [importantPoints, setImportantPoints] = useState<string[]>([]);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [logoutPressed, setLogoutPressed] = useState(false);
 
   const handleDelete = useCallback(async (id: string) => {
     try {
@@ -86,16 +87,16 @@ export default function RoomListScreen() {
   const renderItem = ({ item }: { item: any }) => (
     <Swipeable
       renderRightActions={() => (
-        <View className="flex-row h-full pb-5">
+        <View className="flex-row pb-5">
           <TouchableOpacity
             onPress={() => router.push(`/addition?id=${item.id}`)}
-            className="bg-green-400 w-16 h-full pb-5 items-center justify-center rounded-l-xl"
+            className="bg-[#94B74B] w-[60px] h-[60px] items-center justify-center rounded-l-xl self-center"
           >
             <Text className="text-white font-bold">編集</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => handleDelete(item.id)}
-            className="bg-yellow-500 w-16 h-full pb-5 items-center justify-center rounded-r-xl"
+            className="bg-yellow-500 w-[60px] h-[60px] items-center justify-center rounded-r-xl self-center"
           >
             <Text className="text-white font-bold">削除</Text>
           </TouchableOpacity>
@@ -104,10 +105,10 @@ export default function RoomListScreen() {
     >
       <View
         style={{
-          shadowColor: "#C4C8BE", // your custom shadow color
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.5,
-          shadowRadius: 6,
+          shadowColor: "#000000",
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.2,
+          shadowRadius: 10,
           backgroundColor: "white",
           borderRadius: 16,
           marginHorizontal: 16,
@@ -118,36 +119,36 @@ export default function RoomListScreen() {
         <View className="relative">
           <Image
             source={{ uri: item.img }}
-            className="w-full h-48 rounded-xl mb-4"
+            className="w-full h-48 rounded-t-[16px] mb-4"
             resizeMode="cover"
           />
-          <View className="absolute top-3 right-3 bg-yellow-400 w-16 h-16 rounded-full items-center justify-center">
-            <Text className="text-white font-medium text-[20px]">
+          <View className="absolute top-2 right-3 bg-[#E4C341] w-14 h-14 rounded-full items-center justify-center">
+            <Text className="text-white font-medium text-[16px]">
               {typeof item.score === "number" ? `${item.score}/5` : "?"}
             </Text>
           </View>
         </View>
 
-        <View className="flex-row flex-wrap gap-2 mb-2">
+        <View className="flex-row flex-wrap gap-x-2 gap-y-1 mb-2">
           {(item.merit || []).map((tag: string, i: number) => (
             <View
               key={`merit-${i}`}
-              className="bg-[#FFF6D9] px-3 py-2 rounded-[10px]"
+              className="bg-[#FFF6D9] px-2 py-1.5 rounded-[10px]"
             >
-              <Text className="text-[20px] font-medium text-[#222222]">
+              <Text className="text-[15px] font-medium text-[#222222]">
                 {tag}
               </Text>
             </View>
           ))}
         </View>
 
-        <View className="flex-row flex-wrap gap-2 mb-2">
+        <View className="flex-row flex-wrap gap-x-2 gap-y-1 mb-2">
           {(item.demerit || []).map((tag: string, i: number) => (
             <View
               key={`demerit-${i}`}
-              className="bg-[#F2F2F2] px-3 py-2 rounded-[10px]"
+              className="bg-[#F2F2F2] px-2 py-1.5 rounded-[10px]"
             >
-              <Text className="text-[20px] font-medium text-[#222222]">
+              <Text className="text-[15px] font-medium text-[#222222]">
                 {tag}
               </Text>
             </View>
@@ -171,9 +172,15 @@ export default function RoomListScreen() {
         <View className="flex-row justify-end items-center px-4 pt-4">
           <TouchableOpacity
             onPress={() => setShowLogoutConfirm(true)}
-            className="border border-[#94B74B] px-4 py-2 rounded-full"
+            className={`px-6 py-2 rounded-full border border-[#94B74B] ${
+              showLogoutConfirm ? "bg-[#94B74B]" : "bg-transparent"
+            }`}
           >
-            <Text className="text-[#000000] text-[18px] font-medium">
+            <Text
+              className={`text-[18px] ${
+                showLogoutConfirm ? "text-white" : "text-black"
+              }`}
+            >
               ログアウト
             </Text>
           </TouchableOpacity>
@@ -182,14 +189,14 @@ export default function RoomListScreen() {
         {/* Logout Confirmation Modal */}
         {showLogoutConfirm && (
           <Modal transparent animationType="fade" visible>
-            <View className="flex-1 justify-center items-center bg-black/40">
-              <View className="bg-[#FFFEF7] rounded-xl px-5 py-16 w-[80%] border-[2px] border-[#94B74B] items-center">
-                <Text className="text-[24px] font-normal mb-6">
+            <View className="flex-1 justify-center items-center mt-22 bg-[rgba(0,0,0,0.1)]">
+              <View className="bg-[#FFFDF8] rounded-xl px-5 py-6 w-[92%] border-[1px] border-[#94B74B] items-center">
+                <Text className="text-[24px] font-light mt-14 mb-10">
                   ログアウトしますか？
                 </Text>
-                <View className="flex-row gap-4">
+                <View className="flex-row gap-4 mb-4">
                   <TouchableOpacity
-                    className="bg-[#94B74B] px-12 py-3 rounded-md"
+                    className="bg-[#94B74B] w-[135px] py-2 rounded-md"
                     onPress={async () => {
                       setShowLogoutConfirm(false); // Close modal first
                       try {
@@ -203,15 +210,17 @@ export default function RoomListScreen() {
                       }
                     }}
                   >
-                    <Text className="text-black text-[20px] font-normal">
+                    <Text className="text-black text-[20px] font-normal text-center mt-1">
                       はい
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    className="bg-[#FCDC5A] px-12 py-3 rounded-md"
-                    onPress={() => setShowLogoutConfirm(false)}
+                    className="bg-[#FCDC5A] w-[135px] py-3 rounded-md"
+                    onPress={() => {
+                      setShowLogoutConfirm(false);
+                    }}
                   >
-                    <Text className="text-black text-[20px] font-normal">
+                    <Text className="text-black text-[20px] font-normal text-center">
                       いいえ
                     </Text>
                   </TouchableOpacity>
@@ -227,7 +236,7 @@ export default function RoomListScreen() {
               className="w-20 h-16"
               resizeMode="contain"
             />
-            <Text className="text-gray-800 text-[25px] font-medium">
+            <Text className="text-[#000000] text-[22px] mt-12">
               あなたの条件にあったお部屋
             </Text>
           </View>
@@ -239,8 +248,8 @@ export default function RoomListScreen() {
             読み込み中...
           </Text>
         ) : buildings.length === 0 ? (
-          <View className="bg-[#FDF6E0] rounded-xl mx-4 mt-10 p-5">
-            <Text className="text-lg text-gray-800 text-center">
+          <View className="border border-[#94B74B] border-dashed rounded-xl mx-5 mt-8 p-2 py-14">
+            <Text className="text-[18px] text-black text-left leading-[18px]">
               まだ物件の情報が登録されていません。
               {"\n"}下の＋ボタンから情報を追加してください。
             </Text>
@@ -264,10 +273,10 @@ export default function RoomListScreen() {
         {/* FAB */}
         <View className="absolute bottom-20 left-0 right-0 items-center z-10">
           <TouchableOpacity
-            className="w-24 h-24 rounded-full bg-[#A2BC5A] items-center justify-center shadow-md"
+            className="w-24 h-24 rounded-full bg-[#94B74B] items-center justify-center"
             onPress={() => router.push("/addition")}
           >
-            <Text className="text-white text-5xl leading-[56px]">＋</Text>
+            <Text className="text-white text-[46px] leading-[56px] font-light">＋</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>

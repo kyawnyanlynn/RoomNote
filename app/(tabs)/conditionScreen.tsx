@@ -6,15 +6,18 @@ import { auth, db } from "../../lib/firebaseConfig";
 
 const options = [
   "日当たりがいい",
+    "ペット可",
   "周りが静か",
   "スーパーが近い",
   "病院が近い",
   "24時間ゴミ捨て可能",
   "バス・トイレが綺麗",
+  "オートロック",
   "コンセントが多い",
-  "家具の配置がしやすい",
-  "ペット可",
   "インターネット無料",
+  "防犯カメラ",
+  "宅配ボックス",
+  "家具の配置しやすい",
 ];
 
 export default function ConditionScreen() {
@@ -47,14 +50,14 @@ export default function ConditionScreen() {
           {options.map((option) => (
             <TouchableOpacity
               key={option}
-              className={`border border-gray-400 rounded-full px-4 py-2 m-1 ${
+              className={`border border-gray-400 rounded-full px-3 py-2 m-1 ${
                 selected.includes(option)
                   ? "bg-yellow-200 border-black text-white"
                   : "bg-white"
               }`}
               onPress={() => toggleOption(option)}
             >
-              <Text className="text-center text-lg">{option}</Text>
+              <Text className="text-center text-[16px]">{option}</Text>
             </TouchableOpacity>
           ))}
         </View>

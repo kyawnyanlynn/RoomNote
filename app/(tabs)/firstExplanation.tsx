@@ -139,7 +139,7 @@ export default function ExplanationPager() {
               }}
               onPress={() => router.replace("/login")}
             >
-              <Text style={{ color: "#222", fontSize: 20, fontWeight: "bold" }}>
+              <Text style={{ color: "#74952F", fontSize: 20, fontWeight: "bold" }}>
                 ログイン
               </Text>
             </TouchableOpacity>
