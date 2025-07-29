@@ -93,13 +93,13 @@ export default function RoomListScreen() {
             onPress={() => router.push(`/addition?id=${item.id}`)}
             className="bg-[#94B74B] w-[60px] h-full items-center justify-center rounded-l-xl self-center"
           >
-            <Text className="text-white font-bold">編集</Text>
+            <Image source={require("../../assets/images/edit.png")} className="w-10 h-10" />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => handleDelete(item.id)}
             className="bg-yellow-500 w-[60px] h-full items-center justify-center rounded-r-xl self-center"
           >
-            <Text className="text-white font-bold">削除</Text>
+            <Image source={require("../../assets/images/delete.png")} className="w-10 h-10" />
           </TouchableOpacity>
         </View>
       )}
