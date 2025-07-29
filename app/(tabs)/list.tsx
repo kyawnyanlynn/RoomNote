@@ -70,7 +70,8 @@ export default function RoomListScreen() {
 
               return { ...building, score: parseFloat(matchScore.toFixed(1)) };
             })
-            .filter((doc) => doc.uid === userId);
+            .filter((doc) => doc.uid === userId)
+            .sort((a, b) => b.score - a.score);
 
           setBuildings(data);
         } catch (error) {
@@ -90,13 +91,13 @@ export default function RoomListScreen() {
         <View className="flex-row pb-5">
           <TouchableOpacity
             onPress={() => router.push(`/addition?id=${item.id}`)}
-            className="bg-[#94B74B] w-[60px] h-[60px] items-center justify-center rounded-l-xl self-center"
+            className="bg-[#94B74B] w-[60px] h-full items-center justify-center rounded-l-xl self-center"
           >
             <Text className="text-white font-bold">編集</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => handleDelete(item.id)}
-            className="bg-yellow-500 w-[60px] h-[60px] items-center justify-center rounded-r-xl self-center"
+            className="bg-yellow-500 w-[60px] h-full items-center justify-center rounded-r-xl self-center"
           >
             <Text className="text-white font-bold">削除</Text>
           </TouchableOpacity>
@@ -276,7 +277,9 @@ export default function RoomListScreen() {
             className="w-24 h-24 rounded-full bg-[#94B74B] items-center justify-center"
             onPress={() => router.push("/addition")}
           >
-            <Text className="text-white text-[46px] leading-[56px] font-light">＋</Text>
+            <Text className="text-white text-[46px] leading-[56px] font-light">
+              ＋
+            </Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
